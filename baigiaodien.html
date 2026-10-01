@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý hồ sơ HR</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font:14px Arial;background:#f7f8fa;color:#172b4d}
+.page{padding:20px 30px}
+.bread{color:#52606d;margin-bottom:25px}
+h1{font-size:32px;margin:0}.sub{color:#6b778c}
+
+.toolbar,.card{background:white;border:1px solid #ddd;border-radius:8px;margin-top:20px;padding:15px}
+input,select,button{padding:9px;border:1px solid #ccd2d9;border-radius:6px}
+.search{width:55%}
+button{cursor:pointer}
+.blue{background:#1868db;color:white}
+.green{background:#2f855a;color:white}
+.red{background:#e53e3e;color:white}
+
+table{width:100%;border-collapse:collapse}
+.card{padding:0;overflow:hidden}
+th,td{text-align:left;padding:13px;border-bottom:1px solid #eee}
+th{background:#f4f5f7}
+
+.status{padding:5px 9px;border-radius:15px;font-size:12px;font-weight:bold}
+.pending{background:#fff0b3;color:#7a5b00}
+.approved{background:#d3f8df;color:#176b3a}
+.rejected{background:#ffd6d6;color:#a61b1b}
+
+.modal{
+display:none;position:fixed;inset:0;background:#0008;
+padding:30px;overflow:auto
+}
+.box{
+background:white;max-width:1000px;margin:auto;
+border-radius:8px;overflow:hidden
+}
+.head,.foot{
+padding:15px 20px;border-bottom:1px solid #ddd;
+display:flex;justify-content:space-between;align-items:center
+}
+.body{
+display:grid;grid-template-columns:300px 1fr;
+min-height:500px
+}
+.info{padding:20px;border-right:1px solid #ddd}
+.pdf{padding:15px;background:#555}
+iframe{width:100%;height:470px;background:white;border:0}
+
+.foot{border-top:1px solid #ddd;border-bottom:0}
+.actions{display:flex;gap:8px}
+.reason{display:none;padding:15px 20px;border-top:1px solid #ddd}
+.reason textarea{
+width:100%;height:70px;padding:10px;
+border:1px solid #ccc;border-radius:6px
+}
+
+@media(max-width:700px){
+.body{grid-template-columns:1fr}
+.search{width:100%}
+.info{border-right:0;border-bottom:1px solid #ddd}
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<div class="bread">
+Spaces / 🏠 TTCS_T926_K10S6_N3 / 🔖 SCRUM-19 / 🔗 SCRUM-70
+</div>
+
+<h1>Thiết kế giao diện Xem & Xét duyệt Tài liệu Hồ sơ</h1>
+<p class="sub">Trình xem PDF/CV & nút Duyệt/Từ chối của HR</p>
+
+<div class="toolbar">
+<input id="search" class="search"
+placeholder="🔍 Tìm hồ sơ..."
+oninput="show()">
+
+<select id="filter" onchange="show()">
+<option value="all">Tất cả</option>
+<option value="pending">Chờ duyệt</option>
+<option value="approved">Đã duyệt</option>
+<option value="rejected">Từ chối</option>
+</select>
+</div>
+
+<div class="card">
+<table>
+<thead>
+<tr>
+<th>Mã</th>
+<th>Ứng viên</th>
+<th>Email</th>
+<th>Trạng thái</th>
+<th>Thao tác</th>
+</tr>
+</thead>
+
+<tbody id="list"></tbody>
+</table>
+</div>
+
+</div>
+
+
+<!-- XEM HỒ SƠ -->
+
+<div class="modal" id="modal">
+
+<div class="box">
+
+<div class="head">
+<h2>Chi tiết hồ sơ</h2>
+<button onclick="closeModal()">✕</button>
+</div>
+
+<div class="body">
+
+<div class="info">
+
+<h2 id="name"></h2>
+
+<p><b>Mã:</b> <span id="id"></span></p>
+<p><b>Email:</b> <span id="email"></span></p>
+<p><b>SĐT:</b> <span id="phone"></span></p>
+<p><b>Trường:</b> <span id="school"></span></p>
+<p><b>Chuyên ngành:</b> <span id="major"></span></p>
+
+<p>
+<b>Trạng thái:</b>
+<span id="status"></span>
+</p>
+
+<input type="file"
+accept=".pdf"
+onchange="pdf(event)">
+
+</div>
+
+<div class="pdf">
+<iframe id="frame"></iframe>
+</div>
+
+</div>
+
+
+<!-- NÚT DUYỆT / TỪ CHỐI -->
+
+<div class="foot">
+
+<div id="msg">
+Hồ sơ đang chờ duyệt.
+</div>
+
+<div class="actions">
+
+<button class="red" onclick="reject()">
+✕ Từ chối
+</button>
+
+<button class="green" onclick="approve()">
+✓ Duyệt hồ sơ
+</button>
+
+</div>
+
+</div>
+
+
+<!-- NHẬP LÝ DO TỪ CHỐI -->
+
+<div class="reason" id="reason">
+
+<textarea id="reasonText"
+placeholder="Nhập lý do từ chối hồ sơ..."></textarea>
+
+<br>
+
+<button class="red" onclick="confirmReject()">
+Xác nhận từ chối
+</button>
+
+</div>
+
+</div>
+</div>
+
+
+<script>
+
+let data=[
+{
+id:"HS001",
+name:"Nguyễn Văn A",
+email:"nguyenvana@gmail.com",
+phone:"0901234567",
+school:"Đại học Bách Khoa",
+major:"Công nghệ thông tin",
+status:"pending"
+},
+{
+id:"HS002",
+name:"Trần Thị B",
+email:"tranthib@gmail.com",
+phone:"0912345678",
+school:"Đại học Quốc Gia",
+major:"Kinh tế",
+status:"approved"
+},
+{
+id:"HS003",
+name:"Lê Văn C",
+email:"levanc@gmail.com",
+phone:"0923456789",
+school:"Đại học Thương Mại",
+major:"Marketing",
+status:"rejected"
+}
+];
+
+let current;
+
+
+/* HIỂN THỊ TRẠNG THÁI */
+
+function status(s){
+
+if(s=="approved")
+return '<span class="status approved">✓ Đã duyệt</span>';
+
+if(s=="rejected")
+return '<span class="status rejected">✕ Từ chối</span>';
+
+return '<span class="status pending">⏳ Chờ duyệt</span>';
+}
+
+
+/* HIỂN THỊ DANH SÁCH */
+
+function show(){
+
+let key=search.value.toLowerCase();
+let f=filter.value;
+
+list.innerHTML=data.filter(x=>
+(x.id+x.name+x.email).toLowerCase().includes(key)
+&&(f=="all"||x.status==f)
+).map(x=>`
+
+<tr>
+<td>${x.id}</td>
+<td>${x.name}</td>
+<td>${x.email}</td>
+<td>${status(x.status)}</td>
+
+<td>
+<button class="blue"
+onclick="view('${x.id}')">
+👁 Xem
+</button>
+</td>
+
+</tr>
+
+`).join("");
+}
+
+
+/* XEM HỒ SƠ */
+
+function view(id){
+
+current=data.find(x=>x.id==id);
+
+name.innerText=current.name;
+window.id.innerText=current.id;
+email.innerText=current.email;
+phone.innerText=current.phone;
+school.innerText=current.school;
+major.innerText=current.major;
+status.innerHTML=status(current.status);
+
+reason.style.display="none";
+reasonText.value="";
+
+msg.innerText=
+current.status=="approved"
+?"✓ Hồ sơ đã được duyệt."
+:current.status=="rejected"
+?"✕ Hồ sơ đã bị từ chối."
+:"Hồ sơ đang chờ duyệt.";
+
+modal.style.display="block";
+}
+
+
+/* ĐÓNG */
+
+function closeModal(){
+modal.style.display="none";
+}
+
+
+/* DUYỆT HỒ SƠ */
+
+function approve(){
+
+current.status="approved";
+
+status.innerHTML=status("approved");
+
+msg.innerText="✓ Hồ sơ đã được duyệt thành công.";
+
+reason.style.display="none";
+
+show();
+
+}
+
+
+/* BẤM TỪ CHỐI */
+
+function reject(){
+
+reason.style.display="block";
+
+reasonText.focus();
+
+}
+
+
+/* XÁC NHẬN TỪ CHỐI */
+
+function confirmReject(){
+
+let text=reasonText.value.trim();
+
+if(!text){
+alert("Vui lòng nhập lý do từ chối!");
+return;
+}
+
+current.status="rejected";
+
+status.innerHTML=status("rejected");
+
+msg.innerText="✕ Đã từ chối: "+text;
+
+reason.style.display="none";
+
+show();
+
+}
+
+
+/* XEM PDF */
+
+function pdf(e){
+
+let file=e.target.files[0];
+
+if(file)
+frame.src=URL.createObjectURL(file);
+
+}
+
+
+show();
+
+</script>
+
+</body>
+</html>

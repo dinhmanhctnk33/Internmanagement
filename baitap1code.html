@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý thực tập sinh</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial;background:#f7fafc;color:#243b53}
+header{height:65px;background:#1b365d;color:white;display:flex;align-items:center;justify-content:space-between;padding:0 25px}
+.logo{font-weight:bold;font-size:20px}
+.user{display:flex;align-items:center;gap:10px}
+.avatar{background:white;color:#1b365d;padding:10px;border-radius:50%}
+
+.layout{display:flex;min-height:calc(100vh - 65px)}
+aside{width:220px;background:white;border-right:1px solid #ddd;padding:25px 12px}
+.menu{padding:14px;border-radius:7px;margin:5px 0}
+.menu.active,.menu:hover{background:#e8f0f8;color:#1b365d;font-weight:bold}
+
+main{flex:1;padding:30px}
+.bread{color:#627d98;margin-bottom:20px}
+h1{color:#173e6d;margin-bottom:8px}
+.sub{color:#627d98;margin-bottom:25px}
+
+.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+button{border:0;border-radius:5px;padding:10px 16px;cursor:pointer;font-weight:bold}
+.primary{background:#2c5282;color:white}
+.green{background:#2f855a;color:white}
+.white{background:white;border:1px solid #ccd5df;color:#2c5282}
+
+.card{background:white;border:1px solid #d9e2ec;border-radius:8px;padding:22px;margin-bottom:20px}
+.filters{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+label{font-weight:bold;font-size:14px;margin-bottom:6px}
+input,select{padding:10px;border:1px solid #ccd5df;border-radius:5px;width:100%}
+
+table{width:100%;border-collapse:collapse}
+th,td{padding:13px;border-bottom:1px solid #e2e8f0;text-align:left}
+th{background:#f7fafc;color:#486581}
+.badge{padding:6px 10px;border-radius:15px;font-size:12px;font-weight:bold}
+.ok{background:#c6f6d5;color:#276749}
+.wait{background:#feebc8;color:#9c4221}
+.actions button{padding:6px 8px;margin-right:3px}
+
+.modal{display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.box{background:white;width:550px;padding:25px;border-radius:10px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0}
+.form div{display:flex;flex-direction:column}
+.modal-foot{text-align:right}
+
+@media(max-width:900px){
+.filters{grid-template-columns:1fr 1fr}
+aside{width:180px}
+.head{display:block}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">TTS | HỆ THỐNG QUẢN LÝ THỰC TẬP SINH</div>
+    <div class="user">🔔 👤 HR Manager</div>
+</header>
+
+<div class="layout">
+
+<aside>
+    <div>MENU CHÍNH</div>
+    <div class="menu">📊 Dashboard</div>
+    <div class="menu active">👥 Quản lý TTS</div>
+</aside>
+
+<main>
+
+<div class="bread">Trang chủ / Quản lý TTS / <b>Danh sách</b></div>
+
+<div class="head">
+    <div>
+        <h1>Danh sách & Tìm kiếm / Lọc Thực tập sinh</h1>
+        <p class="sub">Quản lý hồ sơ thực tập sinh theo trường, ngành và trạng thái.</p>
+    </div>
+
+    <button class="primary" onclick="openForm()">＋ Thêm mới TTS</button>
+</div>
+
+<div class="card">
+
+<h3>BỘ LỌC TÌM KIẾM DỮ LIỆU</h3><br>
+
+<div class="filters">
+
+<div>
+<label>Từ khóa</label>
+<input id="key" placeholder="Mã TTS, họ tên...">
+</div>
+
+<div>
+<label>Trường đại học</label>
+<select id="school">
+<option value="">Tất cả trường</option>
+<option>Bách Khoa Hà Nội</option>
+<option>ĐH Quốc Gia</option>
+<option>Đại học FPT</option>
+</select>
+</div>
+
+<div>
+<label>Chuyên ngành</label>
+<select id="major">
+<option value="">Tất cả ngành</option>
+<option>CNTT</option>
+<option>Kinh tế</option>
+<option>Marketing</option>
+</select>
+</div>
+
+<div>
+<label>Trạng thái</label>
+<select id="status">
+<option value="">Tất cả</option>
+<option>Đang thực tập</option>
+<option>Chờ gán</option>
+<option>Đã kết thúc</option>
+</select>
+</div>
+
+</div>
+
+<br>
+
+<button class="primary" onclick="render()">🔍 Tìm kiếm</button>
+<button class="white" onclick="reset()">↻ Đặt lại</button>
+
+</div>
+
+<div class="card">
+
+<div style="display:flex;justify-content:space-between;margin-bottom:15px">
+    <h3>Danh sách thực tập sinh</h3>
+    <button class="green" onclick="alert('Đã xuất dữ liệu!')">📤 Export</button>
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Mã TTS</th>
+<th>Họ và tên</th>
+<th>Trường</th>
+<th>Ngành</th>
+<th>Mentor</th>
+<th>Trạng thái</th>
+<th>Thao tác</th>
+</tr>
+</thead>
+
+<tbody id="list"></tbody>
+
+</table>
+
+</div>
+
+</main>
+</div>
+
+
+<!-- FORM -->
+
+<div class="modal" id="modal">
+
+<div class="box">
+
+<h2>Thêm thực tập sinh</h2>
+
+<form onsubmit="save(event)">
+
+<div class="form">
+
+<div>
+<label>Mã TTS</label>
+<input id="code" required>
+</div>
+
+<div>
+<label>Họ tên</label>
+<input id="name" required>
+</div>
+
+<div>
+<label>Trường</label>
+<input id="uni" required>
+</div>
+
+<div>
+<label>Ngành</label>
+<input id="maj" required>
+</div>
+
+<div>
+<label>Mentor</label>
+<input id="mentor">
+</div>
+
+<div>
+<label>Trạng thái</label>
+<select id="sta">
+<option>Đang thực tập</option>
+<option>Chờ gán</option>
+<option>Đã kết thúc</option>
+</select>
+</div>
+
+</div>
+
+<div class="modal-foot">
+<button type="button" class="white" onclick="closeForm()">Hủy</button>
+<button class="primary">Lưu</button>
+</div>
+
+</form>
+
+</div>
+</div>
+
+
+<script>
+
+let data=[
+["TTS001","Nguyễn Văn A","Bách Khoa Hà Nội","CNTT","Lê Văn X","Đang thực tập"],
+["TTS002","Trần Thị B","ĐH Quốc Gia","Kinh tế","Phạm C","Chờ gán"],
+["TTS003","Lê Minh C","Bách Khoa Hà Nội","CNTT","Nguyễn D","Đang thực tập"],
+["TTS004","Phạm Thị D","ĐH Quốc Gia","Kinh tế","Trần E","Đã kết thúc"]
+];
+
+let edit=-1;
+
+function render(){
+
+let k=document.getElementById("key").value.toLowerCase();
+let s=document.getElementById("school").value;
+let m=document.getElementById("major").value;
+let st=document.getElementById("status").value;
+
+let html="";
+
+data.forEach((x,i)=>{
+
+let text=x.join(" ").toLowerCase();
+
+if(
+(!k||text.includes(k))&&
+(!s||x[2]==s)&&
+(!m||x[3]==m)&&
+(!st||x[5]==st)
+){
+
+html+=`
+<tr>
+<td>${x[0]}</td>
+<td>${x[1]}</td>
+<td>${x[2]}</td>
+<td>${x[3]}</td>
+<td>${x[4]}</td>
+<td>
+<span class="badge ${
+x[5]=="Đang thực tập"?"ok":"wait"
+}">
+${x[5]}
+</span>
+</td>
+<td class="actions">
+<button onclick="view(${i})">👁</button>
+<button onclick="editData(${i})">✏️</button>
+<button onclick="del(${i})">🗑️</button>
+</td>
+</tr>`;
+}
+
+});
+
+document.getElementById("list").innerHTML=
+html||`<tr><td colspan="7">Không tìm thấy dữ liệu</td></tr>`;
+
+}
+
+function openForm(){
+edit=-1;
+document.querySelector("form").reset();
+document.getElementById("modal").classList.add("show");
+}
+
+function closeForm(){
+document.getElementById("modal").classList.remove("show");
+}
+
+function save(e){
+
+e.preventDefault();
+
+let x=[
+code.value,
+name.value,
+uni.value,
+maj.value,
+mentor.value,
+sta.value
+];
+
+if(edit<0)data.push(x);
+else data[edit]=x;
+
+closeForm();
+render();
+
+}
+
+function editData(i){
+
+edit=i;
+
+let x=data[i];
+
+code.value=x[0];
+name.value=x[1];
+uni.value=x[2];
+maj.value=x[3];
+mentor.value=x[4];
+sta.value=x[5];
+
+document.getElementById("modal").classList.add("show");
+
+}
+
+function del(i){
+
+if(confirm("Bạn có muốn xóa thực tập sinh này?")){
+data.splice(i,1);
+render();
+}
+
+}
+
+function view(i){
+
+let x=data[i];
+
+alert(
+"Mã: "+x[0]+
+"\nHọ tên: "+x[1]+
+"\nTrường: "+x[2]+
+"\nNgành: "+x[3]+
+"\nMentor: "+x[4]+
+"\nTrạng thái: "+x[5]
+);
+
+}
+
+function reset(){
+
+document.getElementById("key").value="";
+document.getElementById("school").value="";
+document.getElementById("major").value="";
+document.getElementById("status").value="";
+
+render();
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>

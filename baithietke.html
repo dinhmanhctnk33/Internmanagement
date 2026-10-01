@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quản lý thực tập sinh</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <b>TTS | HỆ THỐNG QUẢN LÝ THỰC TẬP SINH</b>
+    <span>🔔 👤 HR Manager</span>
+</header>
+
+<div class="layout">
+
+<aside>
+    <p>MENU CHÍNH</p>
+    <div>📊 Dashboard</div>
+    <div class="active">👥 Quản lý TTS</div>
+</aside>
+
+<main>
+
+<p class="bread">Trang chủ / Quản lý TTS / <b>Danh sách</b></p>
+
+<section class="title">
+    <div>
+        <h1>Danh sách & Tìm kiếm / Lọc Thực tập sinh</h1>
+        <p>Quản lý hồ sơ thực tập sinh theo trường, ngành và trạng thái.</p>
+    </div>
+    <button onclick="openForm()">＋ Thêm mới TTS</button>
+</section>
+
+<!-- LỌC -->
+<div class="card">
+
+<h3>🔎 BỘ LỌC TÌM KIẾM DỮ LIỆU</h3>
+
+<div class="filter">
+
+<input id="key" placeholder="Mã TTS, họ tên...">
+
+<select id="school">
+<option value="">Tất cả trường</option>
+<option>Bách Khoa Hà Nội</option>
+<option>ĐH Quốc Gia</option>
+<option>Đại học FPT</option>
+</select>
+
+<select id="major">
+<option value="">Tất cả ngành</option>
+<option>CNTT</option>
+<option>Kinh tế</option>
+<option>Marketing</option>
+</select>
+
+<select id="status">
+<option value="">Tất cả trạng thái</option>
+<option>Đang thực tập</option>
+<option>Chờ gán</option>
+<option>Đã kết thúc</option>
+</select>
+
+</div>
+
+<br>
+
+<button onclick="render()">🔍 Tìm kiếm</button>
+<button class="white" onclick="resetFilter()">↻ Đặt lại</button>
+
+</div>
+
+
+<!-- DANH SÁCH -->
+
+<div class="card">
+
+<div class="table-title">
+    <h3>Danh sách thực tập sinh</h3>
+    <button class="green" onclick="exportData()">📤 Export</button>
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Mã TTS</th>
+<th>Họ và tên</th>
+<th>Trường</th>
+<th>Ngành</th>
+<th>Mentor</th>
+<th>Trạng thái</th>
+<th>Thao tác</th>
+</tr>
+</thead>
+
+<tbody id="list"></tbody>
+
+</table>
+
+</div>
+
+</main>
+</div>
+
+
+<!-- FORM -->
+
+<div class="modal" id="modal">
+
+<div class="box">
+
+<h2>Thông tin thực tập sinh</h2>
+
+<form onsubmit="save(event)">
+
+<div class="form">
+
+<input id="code" placeholder="Mã TTS" required>
+<input id="name" placeholder="Họ tên" required>
+<input id="uni" placeholder="Trường" required>
+<input id="maj" placeholder="Ngành" required>
+<input id="mentor" placeholder="Mentor">
+
+<select id="sta">
+<option>Đang thực tập</option>
+<option>Chờ gán</option>
+<option>Đã kết thúc</option>
+</select>
+
+</div>
+
+<div class="right">
+<button type="button" class="white" onclick="closeForm()">Hủy</button>
+<button>Lưu</button>
+</div>
+
+</form>
+
+</div>
+</div>
+
+
+<script>
+
+let data=[
+["TTS001","Nguyễn Văn A","Bách Khoa Hà Nội","CNTT","Lê Văn X","Đang thực tập"],
+["TTS002","Trần Thị B","ĐH Quốc Gia","Kinh tế","Phạm C","Chờ gán"],
+["TTS003","Lê Minh C","Bách Khoa Hà Nội","CNTT","Nguyễn D","Đang thực tập"],
+["TTS004","Phạm Thị D","ĐH Quốc Gia","Kinh tế","Trần E","Đã kết thúc"]
+];
+
+let edit=-1;
+
+function render(){
+
+let k=key.value.toLowerCase();
+let s=school.value,m=major.value,st=status.value;
+
+list.innerHTML=data.map((x,i)=>{
+
+if(
+(!k||x.join(" ").toLowerCase().includes(k))&&
+(!s||x[2]==s)&&
+(!m||x[3]==m)&&
+(!st||x[5]==st)
+)
+return `<tr>
+<td>${x[0]}</td><td>${x[1]}</td><td>${x[2]}</td>
+<td>${x[3]}</td><td>${x[4]}</td>
+<td><span class="badge">${x[5]}</span></td>
+<td>
+<button onclick="view(${i})">👁</button>
+<button onclick="editData(${i})">✏️</button>
+<button onclick="del(${i})">🗑️</button>
+</td></tr>`;
+
+}).join("");
+
+}
+
+function openForm(){
+edit=-1;
+document.querySelector("form").reset();
+modal.classList.add("show");
+}
+
+function closeForm(){
+modal.classList.remove("show");
+}
+
+function save(e){
+
+e.preventDefault();
+
+let x=[
+code.value,name.value,uni.value,
+maj.value,mentor.value,sta.value
+];
+
+edit<0 ? data.push(x) : data[edit]=x;
+
+closeForm();
+render();
+
+}
+
+function editData(i){
+
+edit=i;
+let x=data[i];
+
+code.value=x[0];
+name.value=x[1];
+uni.value=x[2];
+maj.value=x[3];
+mentor.value=x[4];
+sta.value=x[5];
+
+modal.classList.add("show");
+
+}
+
+function del(i){
+
+if(confirm("Bạn có muốn xóa TTS này?")){
+data.splice(i,1);
+render();
+}
+
+}
+
+function view(i){
+
+let x=data[i];
+
+alert(
+"Mã: "+x[0]+
+"\nHọ tên: "+x[1]+
+"\nTrường: "+x[2]+
+"\nNgành: "+x[3]+
+"\nMentor: "+x[4]+
+"\nTrạng thái: "+x[5]
+);
+
+}
+
+function resetFilter(){
+
+key.value="";
+school.value="";
+major.value="";
+status.value="";
+
+render();
+
+}
+
+function exportData(){
+
+alert("📤 Export thành công!\nDữ liệu đã được xuất.");
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>
