@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hệ thống quản lý thực tập sinh</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:#f7fafc;
+    color:#243b53;
+}
+
+/* HEADER */
+header{
+    height:65px;
+    background:#1b365d;
+    color:white;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 25px;
+}
+
+/* LAYOUT */
+.layout{
+    display:flex;
+    min-height:calc(100vh - 65px);
+}
+
+/* SIDEBAR */
+aside{
+    width:220px;
+    background:white;
+    padding:25px 12px;
+    border-right:1px solid #ddd;
+}
+
+aside p{
+    color:#627d98;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+aside div{
+    padding:14px;
+    margin:5px 0;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+aside .active,
+aside div:hover{
+    background:#e8f0f8;
+    color:#1b365d;
+    font-weight:bold;
+}
+
+/* MAIN */
+main{
+    flex:1;
+    padding:30px;
+}
+
+.bread{
+    color:#627d98;
+    margin-bottom:20px;
+}
+
+.title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+h1,h3{
+    color:#173e6d;
+}
+
+.title p{
+    color:#627d98;
+    margin-top:8px;
+}
+
+/* CARD */
+.card{
+    background:white;
+    padding:22px;
+    border:1px solid #d9e2ec;
+    border-radius:8px;
+    margin-bottom:20px;
+}
+
+/* FILTER */
+.filter{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-top:18px;
+}
+
+input,
+select{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccd5df;
+    border-radius:5px;
+    outline:none;
+}
+
+input:focus,
+select:focus{
+    border-color:#2c5282;
+}
+
+/* BUTTON */
+button{
+    padding:9px 14px;
+    border:0;
+    border-radius:5px;
+    background:#2c5282;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:.85;
+}
+
+.white{
+    background:white;
+    color:#2c5282;
+    border:1px solid #ccd5df;
+}
+
+.green{
+    background:#2f855a;
+}
+
+.red{
+    background:#c53030;
+}
+
+/* TABLE */
+.table-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,
+td{
+    padding:13px;
+    border-bottom:1px solid #e2e8f0;
+    text-align:left;
+}
+
+th{
+    background:#f7fafc;
+    color:#486581;
+}
+
+.badge{
+    background:#c6f6d5;
+    color:#276749;
+    padding:6px 9px;
+    border-radius:15px;
+    font-size:12px;
+}
+
+.action button{
+    padding:6px 9px;
+    margin-right:3px;
+}
+
+/* MODAL */
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    align-items:center;
+    justify-content:center;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.box{
+    background:white;
+    width:550px;
+    padding:25px;
+    border-radius:10px;
+}
+
+.box h2{
+    color:#173e6d;
+    margin-bottom:10px;
+}
+
+.form{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+    margin:20px 0;
+}
+
+.right{
+    text-align:right;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+
+    .filter{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .title{
+        display:block;
+    }
+
+    .title button{
+        margin-top:15px;
+    }
+
+    table{
+        font-size:13px;
+    }
+}
+
+@media(max-width:600px){
+
+    aside{
+        width:160px;
+    }
+
+    main{
+        padding:15px;
+    }
+
+    .filter,
+    .form{
+        grid-template-columns:1fr;
+    }
+
+    header{
+        font-size:12px;
+    }
+
+    table{
+        display:block;
+        overflow-x:auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+    <b>TTS | HỆ THỐNG QUẢN LÝ THỰC TẬP SINH</b>
+    <span>HR 🔔 👤 Manager</span>
+</header>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside>
+
+    <p>MENU CHÍNH</p>
+
+    <div>
+        📊 Dashboard
+    </div>
+
+    <div class="active">
+        👥 Quản lý TTS
+    </div>
+
+</aside>
+
+
+<!-- MAIN -->
+<main>
+
+    <p class="bread">
+        Trang chủ / Quản lý TTS / <b>Danh sách</b>
+    </p>
+
+
+    <!-- TITLE -->
+    <section class="title">
+
+        <div>
+            <h1>
+                Danh sách & Tìm kiếm / Lọc Thực tập sinh
+            </h1>
+
+            <p>
+                Quản lý hồ sơ thực tập sinh theo trường,
+                ngành và trạng thái.
+            </p>
+        </div>
+
+        <button onclick="openForm()">
+            ＋ Thêm mới TTS
+        </button>
+
+    </section>
+
+
+    <!-- BỘ LỌC -->
+    <div class="card">
+
+        <h3>
+            🔎 BỘ LỌC TÌM KIẾM DỮ LIỆU
+        </h3>
+
+        <div class="filter">
+
+            <input
+                id="key"
+                placeholder="Mã TTS, họ tên..."
+            >
+
+            <select id="school">
+
+                <option value="">
+                    Tất cả trường
+                </option>
+
+                <option>
+                    Bách Khoa Hà Nội
+                </option>
+
+                <option>
+                    ĐH Quốc Gia
+                </option>
+
+                <option>
+                    Đại học FPT
+                </option>
+
+            </select>
+
+
+            <select id="major">
+
+                <option value="">
+                    Tất cả ngành
+                </option>
+
+                <option>
+                    CNTT
+                </option>
+
+                <option>
+                    Kinh tế
+                </option>
+
+                <option>
+                    Marketing
+                </option>
+
+            </select>
+
+
+            <select id="status">
+
+                <option value="">
+                    Tất cả trạng thái
+                </option>
+
+                <option>
+                    Đang thực tập
+                </option>
+
+                <option>
+                    Chờ gán
+                </option>
+
+                <option>
+                    Đã kết thúc
+                </option>
+
+            </select>
+
+        </div>
+
+        <br>
+
+        <button onclick="render()">
+            🔍 Tìm kiếm
+        </button>
+
+        <button
+            class="white"
+            onclick="resetFilter()"
+        >
+            ↻ Đặt lại
+        </button>
+
+    </div>
+
+
+    <!-- DANH SÁCH -->
+    <div class="card">
+
+        <div class="table-title">
+
+            <h3>
+                Danh sách thực tập sinh
+            </h3>
+
+            <button
+                class="green"
+                onclick="exportData()"
+            >
+                📤 Export
+            </button>
+
+        </div>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Mã TTS</th>
+                    <th>Họ và tên</th>
+                    <th>Trường</th>
+                    <th>Ngành</th>
+                    <th>Mentor</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody id="list"></tbody>
+
+        </table>
+
+    </div>
+
+</main>
+
+</div>
+
+
+<!-- FORM THÊM / SỬA -->
+<div
+    class="modal"
+    id="modal"
+>
+
+    <div class="box">
+
+        <h2>
+            Thông tin thực tập sinh
+        </h2>
+
+
+        <form onsubmit="save(event)">
+
+            <div class="form">
+
+                <input
+                    id="code"
+                    placeholder="Mã TTS"
+                    required
+                >
+
+                <input
+                    id="name"
+                    placeholder="Họ tên"
+                    required
+                >
+
+                <input
+                    id="uni"
+                    placeholder="Trường"
+                    required
+                >
+
+                <input
+                    id="maj"
+                    placeholder="Ngành"
+                    required
+                >
+
+                <input
+                    id="mentor"
+                    placeholder="Mentor"
+                >
+
+                <select id="sta">
+
+                    <option>
+                        Đang thực tập
+                    </option>
+
+                    <option>
+                        Chờ gán
+                    </option>
+
+                    <option>
+                        Đã kết thúc
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="right">
+
+                <button
+                    type="button"
+                    class="white"
+                    onclick="closeForm()"
+                >
+                    Hủy
+                </button>
+
+                <button>
+                    Lưu
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* DỮ LIỆU MẪU */
+
+let data = [
+
+    [
+        "TTS001",
+        "Nguyễn Văn A",
+        "Bách Khoa Hà Nội",
+        "CNTT",
+        "Lê Văn X",
+        "Đang thực tập"
+    ],
+
+    [
+        "TTS002",
+        "Trần Thị B",
+        "ĐH Quốc Gia",
+        "Kinh tế",
+        "Phạm C",
+        "Chờ gán"
+    ],
+
+    [
+        "TTS003",
+        "Lê Minh C",
+        "Bách Khoa Hà Nội",
+        "CNTT",
+        "Nguyễn D",
+        "Đang thực tập"
+    ],
+
+    [
+        "TTS004",
+        "Phạm Thị D",
+        "ĐH Quốc Gia",
+        "Kinh tế",
+        "Trần E",
+        "Đã kết thúc"
+    ]
+
+];
+
+
+let edit = -1;
+
+
+/* HIỂN THỊ DANH SÁCH */
+
+function render(){
+
+    let k =
+        document.getElementById("key")
+        .value
+        .toLowerCase();
+
+    let s =
+        document.getElementById("school")
+        .value;
+
+    let m =
+        document.getElementById("major")
+        .value;
+
+    let st =
+        document.getElementById("status")
+        .value;
+
+
+    let result = data.filter(x => {
+
+        let keyword =
+            !k ||
+            x.join(" ")
+            .toLowerCase()
+            .includes(k);
+
+        let school =
+            !s || x[2] === s;
+
+        let major =
+            !m || x[3] === m;
+
+        let status =
+            !st || x[5] === st;
+
+        return keyword &&
+               school &&
+               major &&
+               status;
+
+    });
+
+
+    document.getElementById("list").innerHTML =
+        result.map(x => {
+
+            let index = data.indexOf(x);
+
+            return `
+
+            <tr>
+
+                <td>${x[0]}</td>
+
+                <td>${x[1]}</td>
+
+                <td>${x[2]}</td>
+
+                <td>${x[3]}</td>
+
+                <td>${x[4]}</td>
+
+                <td>
+                    <span class="badge">
+                        ${x[5]}
+                    </span>
+                </td>
+
+                <td class="action">
+
+                    <button
+                        onclick="view(${index})"
+                    >
+                        👁
+                    </button>
+
+                    <button
+                        onclick="editData(${index})"
+                    >
+                        ✏️
+                    </button>
+
+                    <button
+                        class="red"
+                        onclick="del(${index})"
+                    >
+                        🗑️
+                    </button>
+
+                </td>
+
+            </tr>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* MỞ FORM */
+
+function openForm(){
+
+    edit = -1;
+
+    document.querySelector("form").reset();
+
+    document
+        .getElementById("modal")
+        .classList
+        .add("show");
+}
+
+
+/* ĐÓNG FORM */
+
+function closeForm(){
+
+    document
+        .getElementById("modal")
+        .classList
+        .remove("show");
+
+}
+
+
+/* LƯU */
+
+function save(e){
+
+    e.preventDefault();
+
+
+    let x = [
+
+        document.getElementById("code").value,
+
+        document.getElementById("name").value,
+
+        document.getElementById("uni").value,
+
+        document.getElementById("maj").value,
+
+        document.getElementById("mentor").value,
+
+        document.getElementById("sta").value
+
+    ];
+
+
+    if(edit < 0){
+
+        data.push(x);
+
+    }else{
+
+        data[edit] = x;
+
+    }
+
+
+    closeForm();
+
+    render();
+
+}
+
+
+/* SỬA */
+
+function editData(i){
+
+    edit = i;
+
+    let x = data[i];
+
+
+    document.getElementById("code").value = x[0];
+
+    document.getElementById("name").value = x[1];
+
+    document.getElementById("uni").value = x[2];
+
+    document.getElementById("maj").value = x[3];
+
+    document.getElementById("mentor").value = x[4];
+
+    document.getElementById("sta").value = x[5];
+
+
+    document
+        .getElementById("modal")
+        .classList
+        .add("show");
+
+}
+
+
+/* XÓA */
+
+function del(i){
+
+    if(
+        confirm(
+            "Bạn có muốn xóa thực tập sinh này?"
+        )
+    ){
+
+        data.splice(i,1);
+
+        render();
+
+    }
+
+}
+
+
+/* XEM */
+
+function view(i){
+
+    let x = data[i];
+
+
+    alert(
+
+        "Mã TTS: " + x[0] +
+
+        "\nHọ tên: " + x[1] +
+
+        "\nTrường: " + x[2] +
+
+        "\nNgành: " + x[3] +
+
+        "\nMentor: " + x[4] +
+
+        "\nTrạng thái: " + x[5]
+
+    );
+
+}
+
+
+/* ĐẶT LẠI */
+
+function resetFilter(){
+
+    document.getElementById("key").value = "";
+
+    document.getElementById("school").value = "";
+
+    document.getElementById("major").value = "";
+
+    document.getElementById("status").value = "";
+
+    render();
+
+}
+
+
+/* EXPORT */
+
+function exportData(){
+
+    let text =
+        "Mã TTS,Họ tên,Trường,Ngành,Mentor,Trạng thái\n";
+
+    data.forEach(x => {
+
+        text += x.join(",") + "\n";
+
+    });
+
+
+    let blob =
+        new Blob(
+            [text],
+            {type:"text/csv;charset=utf-8;"}
+        );
+
+
+    let url =
+        URL.createObjectURL(blob);
+
+
+    let a =
+        document.createElement("a");
+
+    a.href = url;
+
+    a.download =
+        "danh_sach_thuc_tap_sinh.csv";
+
+    a.click();
+
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+/* CHẠY KHI MỞ TRANG */
+
+render();
+
+</script>
+
+</body>
+</html>
