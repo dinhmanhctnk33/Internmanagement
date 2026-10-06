@@ -202,14 +202,14 @@ CREATE TABLE intern_documents (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tài liệu/giấy tờ đính kèm của thực tập sinh';
 
 -- 7.1 Hàng đợi email kết quả xét duyệt -------------------------------------
-CREATE TABLE review_email_queue (
+CREATE TABLE candidate_result_email_queue (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    document_id         BIGINT       NOT NULL,
+    candidate_id        BIGINT       NOT NULL,
     recipient_email     VARCHAR(254) NOT NULL,
     recipient_name      VARCHAR(150) NOT NULL,
-    document_name       VARCHAR(255) NOT NULL,
+    desired_position    VARCHAR(150) NULL,
     decision            VARCHAR(20)  NOT NULL,
-    rejection_reason    TEXT         NULL,
+    decision_reason     TEXT         NOT NULL,
     status              VARCHAR(20)  NOT NULL DEFAULT 'PENDING',
     attempt_count       INT          NOT NULL DEFAULT 0,
     scheduled_at        DATETIME     NOT NULL,
@@ -218,11 +218,11 @@ CREATE TABLE review_email_queue (
     last_error          VARCHAR(1000) NULL,
     created_at          DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT uq_review_email_document UNIQUE (document_id),
-    CONSTRAINT fk_review_email_document FOREIGN KEY (document_id) REFERENCES intern_documents(id)
+    CONSTRAINT uq_result_email_candidate UNIQUE (candidate_id),
+    CONSTRAINT fk_result_email_candidate FOREIGN KEY (candidate_id) REFERENCES candidates(id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT chk_review_email_decision CHECK (decision IN ('APPROVED','REJECTED')),
-    CONSTRAINT chk_review_email_status CHECK (status IN ('PENDING','PROCESSING','SENT','FAILED','FAILED_FINAL','CANCELLED'))
+    CONSTRAINT chk_result_email_decision CHECK (decision IN ('PASSED','FAILED')),
+    CONSTRAINT chk_result_email_status CHECK (status IN ('PENDING','PROCESSING','SENT','FAILED','FAILED_FINAL','CANCELLED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Hàng đợi gửi email kết quả xét duyệt';
 
 -- 8. contracts -----------------------------------------------------------------

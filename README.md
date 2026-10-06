@@ -53,14 +53,15 @@ IMS_SMTP_HOST=smtp.gmail.com
 IMS_SMTP_PORT=587
 IMS_SMTP_USER=<email-gui>
 IMS_SMTP_PASSWORD=<app-password>
-IMS_RESULT_EMAIL_HOUR=9
 IMS_RESULT_EMAIL_MAX_ATTEMPTS=3
 IMS_RESULT_EMAIL_RETRY_MINUTES=30
 ```
 
-Khi HR duyệt hoặc từ chối tài liệu/hồ sơ, hệ thống ghi email vào hàng đợi
-`review_email_queue`. Tiến trình nền kiểm tra hàng đợi mỗi phút và gửi các email
-đến hạn. HR theo dõi trạng thái tại `/review-emails`.
+Khi HR xác nhận ứng viên **Đỗ** hoặc **Trượt** kèm lý do tại `/applications`, hệ thống
+tự tạo email theo mẫu và gửi ngay. Nếu SMTP tạm thời gặp lỗi, email được giữ trong
+`candidate_result_email_queue`; tiến trình nền kiểm tra mỗi phút và tự thử lại. HR
+theo dõi trạng thái tại `/review-emails`. Việc duyệt tài liệu/CV không phát sinh email
+kết quả tuyển dụng.
 
 Không commit `target/`, `tmp/`, `node_modules/`, file cookie hoặc file cấu hình
 chứa mật khẩu.

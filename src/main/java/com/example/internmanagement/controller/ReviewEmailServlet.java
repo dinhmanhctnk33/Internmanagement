@@ -10,8 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @WebServlet("/review-emails")
 public class ReviewEmailServlet extends HttpServlet {
@@ -26,7 +24,6 @@ public class ReviewEmailServlet extends HttpServlet {
         try {
             request.setAttribute("jobs", dao.findAll());
             request.setAttribute("smtpConfigured", EmailUtility.isConfigured());
-            request.setAttribute("sendHour", ReviewEmailProcessor.configuredSendHour());
             request.getRequestDispatcher("/WEB-INF/views/review-emails.jsp").forward(request, response);
         } catch (Exception error) { throw new ServletException("Không thể tải hàng đợi email", error); }
     }

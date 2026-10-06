@@ -14,8 +14,8 @@ public class ReviewEmailProcessor {
         for (ReviewEmailJob job : dao.findDue(50)) {
             if (!dao.claim(job.getId())) continue;
             try {
-                EmailUtility.sendReviewResultEmail(job.getRecipientEmail(), job.getRecipientName(),
-                        job.getDocumentName(), job.getDecision(), job.getRejectionReason());
+                EmailUtility.sendApplicationResultEmail(job.getRecipientEmail(), job.getRecipientName(),
+                        job.getDesiredPosition(), job.getDecision(), job.getDecisionReason());
                 dao.markSent(job.getId());
                 sent++;
             } catch (Exception error) {
@@ -24,10 +24,6 @@ public class ReviewEmailProcessor {
             }
         }
         return sent;
-    }
-
-    public static int configuredSendHour() {
-        return intSetting("IMS_RESULT_EMAIL_HOUR", 9, 0, 23);
     }
 
     private static int intSetting(String name, int fallback, int min, int max) {

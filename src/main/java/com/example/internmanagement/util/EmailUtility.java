@@ -43,25 +43,25 @@ public class EmailUtility {
         Transport.send(message);
     }
 
-    public static void sendReviewResultEmail(String recipientEmail, String fullName,
-            String documentName, String decision, String rejectionReason)
+    public static void sendApplicationResultEmail(String recipientEmail, String fullName,
+            String desiredPosition, String decision, String decisionReason)
             throws MessagingException, UnsupportedEncodingException {
         if (!isConfigured()) throw new MessagingException("SMTP chưa được cấu hình.");
-        String approved = "APPROVED".equals(decision) ? "Đã duyệt" : "Bị từ chối";
-        String color = "APPROVED".equals(decision) ? "#18794e" : "#b42318";
-        String reason = "REJECTED".equals(decision)
-                ? "<p><strong>Lý do:</strong> " + html(rejectionReason == null || rejectionReason.isBlank()
-                    ? "Chưa có ghi chú bổ sung." : rejectionReason) + "</p>" : "";
+        boolean passed = "PASSED".equals(decision);
+        String result = passed ? "ĐỖ" : "TRƯỢT";
+        String color = passed ? "#18794e" : "#b42318";
+        String position = desiredPosition == null || desiredPosition.isBlank() ? "Chương trình thực tập" : desiredPosition;
         String content = "<div style='font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:28px;border:1px solid #dce5f0;border-radius:14px;color:#243b57;'>"
                 + "<h2 style='margin:0 0 18px;color:#173d70;'>IMS Portal</h2>"
                 + "<p>Chào " + html(fullName) + ",</p>"
-                + "<p>Hồ sơ/tài liệu <strong>" + html(documentName) + "</strong> của bạn đã có kết quả xét duyệt.</p>"
+                + "<p>Cảm ơn bạn đã tham gia ứng tuyển vị trí <strong>" + html(position) + "</strong>.</p>"
+                + "<p>Phòng Nhân sự xin thông báo kết quả xét duyệt hồ sơ của bạn:</p>"
                 + "<div style='margin:20px 0;padding:14px 18px;border-radius:9px;background:#f4f7fb;border-left:4px solid " + color + ";'>"
-                + "<strong style='color:" + color + ";font-size:17px;'>" + approved + "</strong></div>"
-                + reason
-                + "<p>Bạn có thể đăng nhập IMS Portal để xem thông tin chi tiết.</p>"
+                + "<strong style='color:" + color + ";font-size:18px;'>KẾT QUẢ: " + result + "</strong></div>"
+                + "<p><strong>Lý do/nhận xét từ HR:</strong><br>" + html(decisionReason) + "</p>"
+                + (passed ? "<p>HR sẽ tiếp tục liên hệ với bạn về thủ tục tiếp nhận và hợp đồng thực tập.</p>" : "<p>Cảm ơn bạn đã quan tâm tới chương trình. Chúc bạn thành công trong những cơ hội tiếp theo.</p>")
                 + "<p style='margin-top:24px;font-size:12px;color:#718096;'>Đây là email tự động, vui lòng không phản hồi.</p></div>";
-        sendHtml(recipientEmail, "Kết quả xét duyệt hồ sơ - IMS Portal", content);
+        sendHtml(recipientEmail, "Thông báo kết quả ứng tuyển thực tập - IMS Portal", content);
     }
 
     private static void sendHtml(String recipientEmail, String subject, String htmlContent)
