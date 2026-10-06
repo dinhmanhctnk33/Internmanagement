@@ -44,5 +44,23 @@ Sau khi build, deploy `target/Internmanagement.war` lên Tomcat 10.1+, sau đó 
 http://localhost:8080/Internmanagement/login
 ```
 
+## Cấu hình email kết quả xét duyệt
+
+Khai báo các biến môi trường trước khi khởi động Tomcat:
+
+```text
+IMS_SMTP_HOST=smtp.gmail.com
+IMS_SMTP_PORT=587
+IMS_SMTP_USER=<email-gui>
+IMS_SMTP_PASSWORD=<app-password>
+IMS_RESULT_EMAIL_HOUR=9
+IMS_RESULT_EMAIL_MAX_ATTEMPTS=3
+IMS_RESULT_EMAIL_RETRY_MINUTES=30
+```
+
+Khi HR duyệt hoặc từ chối tài liệu/hồ sơ, hệ thống ghi email vào hàng đợi
+`review_email_queue`. Tiến trình nền kiểm tra hàng đợi mỗi phút và gửi các email
+đến hạn. HR theo dõi trạng thái tại `/review-emails`.
+
 Không commit `target/`, `tmp/`, `node_modules/`, file cookie hoặc file cấu hình
 chứa mật khẩu.

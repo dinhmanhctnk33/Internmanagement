@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @WebServlet({"/documents/upload", "/documents/review", "/uploads/*"})
@@ -119,14 +120,30 @@ public class DocumentServlet extends HttpServlet {
                 (com.example.internmanagement.model.User) request.getSession().getAttribute("user");
             Long reviewerId = (sessionUser != null) ? (long) sessionUser.getId() : null;
 
-            dao.review(documentId, status, reviewNote, reviewerId);
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime scheduledAt = now.with(LocalTime.of(
+                    com.example.internmanagement.util.ReviewEmailProcessor.configuredSendHour(), 0));
+            if (!scheduledAt.isAfter(now)) scheduledAt = scheduledAt.plusDays(1);
+            try (java.sql.Connection connection = com.example.internmanagement.util.DBConnection.getConnection()) {
+                connection.setAutoCommit(false);
+                try {
+                    boolean changed = dao.review(connection, documentId, status, reviewNote, reviewerId);
+                    if (!changed) throw new IllegalStateException("Hồ sơ đã được xử lý trước đó.");
+                    int queued = new com.example.internmanagement.dao.ReviewEmailQueueDAO()
+                            .enqueue(connection, documentId, status, reviewNote, scheduledAt);
+                    if (queued == 0) throw new IllegalStateException("Không tìm thấy email của thực tập sinh.");
+                    connection.commit();
+                } catch (Exception error) {
+                    connection.rollback(); throw error;
+                } finally { connection.setAutoCommit(true); }
+            }
 
             // Nếu duyệt từ trang profile intern, trở về profile; nếu từ trang review → về review
             String referer = request.getHeader("Referer");
             if (referer != null && referer.contains("/interns/profile")) {
-                response.sendRedirect(request.getContextPath() + "/interns/profile?id=" + internId + "&reviewed=1");
+                response.sendRedirect(request.getContextPath() + "/interns/profile?id=" + internId + "&reviewed=1&email=queued");
             } else {
-                response.sendRedirect(request.getContextPath() + "/documents/review?reviewed=1");
+                response.sendRedirect(request.getContextPath() + "/documents/review?reviewed=1&email=queued");
             }
 
         } catch (Exception e) {

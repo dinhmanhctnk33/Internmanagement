@@ -31,6 +31,7 @@
             <a href="${pageContext.request.contextPath}/interns" class="menu-item"><i class="fa-solid fa-users"></i><span>Thực tập sinh & Lọc</span></a>
             <a href="${pageContext.request.contextPath}/interns/new" class="menu-item"><i class="fa-solid fa-user-plus"></i><span>Thêm hồ sơ TTS</span></a>
             <a href="${pageContext.request.contextPath}/documents/review" class="menu-item active"><i class="fa-solid fa-file-circle-check"></i><span>Duyệt tài liệu & CV</span></a>
+            <a href="${pageContext.request.contextPath}/review-emails" class="menu-item"><i class="fa-solid fa-envelope-circle-check"></i><span>Email kết quả</span></a>
         </nav>
         <div class="sidebar-bottom">
             <a href="${pageContext.request.contextPath}/logout" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất</span></a>
@@ -64,7 +65,7 @@
 
             <c:if test="${param.reviewed == '1'}">
                 <div style="background:#F0FFF4;color:var(--success-badge);border:1px solid #C6F6D5;padding:12px 16px;border-radius:8px;margin-bottom:20px;font-weight:600;">
-                    <i class="fa-solid fa-circle-check"></i> Đã xử lý tài liệu thành công!
+                    <i class="fa-solid fa-circle-check"></i> Đã xử lý tài liệu và xếp email kết quả vào hàng đợi!
                 </div>
             </c:if>
             <c:if test="${not empty error}">

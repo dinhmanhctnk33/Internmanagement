@@ -201,6 +201,30 @@ CREATE TABLE intern_documents (
     CONSTRAINT chk_intern_documents_status CHECK (approval_status IN ('PENDING','APPROVED','REJECTED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tài liệu/giấy tờ đính kèm của thực tập sinh';
 
+-- 7.1 Hàng đợi email kết quả xét duyệt -------------------------------------
+CREATE TABLE review_email_queue (
+    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    document_id         BIGINT       NOT NULL,
+    recipient_email     VARCHAR(254) NOT NULL,
+    recipient_name      VARCHAR(150) NOT NULL,
+    document_name       VARCHAR(255) NOT NULL,
+    decision            VARCHAR(20)  NOT NULL,
+    rejection_reason    TEXT         NULL,
+    status              VARCHAR(20)  NOT NULL DEFAULT 'PENDING',
+    attempt_count       INT          NOT NULL DEFAULT 0,
+    scheduled_at        DATETIME     NOT NULL,
+    next_attempt_at     DATETIME     NOT NULL,
+    sent_at             DATETIME     NULL,
+    last_error          VARCHAR(1000) NULL,
+    created_at          DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uq_review_email_document UNIQUE (document_id),
+    CONSTRAINT fk_review_email_document FOREIGN KEY (document_id) REFERENCES intern_documents(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT chk_review_email_decision CHECK (decision IN ('APPROVED','REJECTED')),
+    CONSTRAINT chk_review_email_status CHECK (status IN ('PENDING','PROCESSING','SENT','FAILED','FAILED_FINAL','CANCELLED'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Hàng đợi gửi email kết quả xét duyệt';
+
 -- 8. contracts -----------------------------------------------------------------
 CREATE TABLE contracts (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,

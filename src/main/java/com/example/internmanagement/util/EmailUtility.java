@@ -43,6 +43,47 @@ public class EmailUtility {
         Transport.send(message);
     }
 
+    public static void sendReviewResultEmail(String recipientEmail, String fullName,
+            String documentName, String decision, String rejectionReason)
+            throws MessagingException, UnsupportedEncodingException {
+        if (!isConfigured()) throw new MessagingException("SMTP chưa được cấu hình.");
+        String approved = "APPROVED".equals(decision) ? "Đã duyệt" : "Bị từ chối";
+        String color = "APPROVED".equals(decision) ? "#18794e" : "#b42318";
+        String reason = "REJECTED".equals(decision)
+                ? "<p><strong>Lý do:</strong> " + html(rejectionReason == null || rejectionReason.isBlank()
+                    ? "Chưa có ghi chú bổ sung." : rejectionReason) + "</p>" : "";
+        String content = "<div style='font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:28px;border:1px solid #dce5f0;border-radius:14px;color:#243b57;'>"
+                + "<h2 style='margin:0 0 18px;color:#173d70;'>IMS Portal</h2>"
+                + "<p>Chào " + html(fullName) + ",</p>"
+                + "<p>Hồ sơ/tài liệu <strong>" + html(documentName) + "</strong> của bạn đã có kết quả xét duyệt.</p>"
+                + "<div style='margin:20px 0;padding:14px 18px;border-radius:9px;background:#f4f7fb;border-left:4px solid " + color + ";'>"
+                + "<strong style='color:" + color + ";font-size:17px;'>" + approved + "</strong></div>"
+                + reason
+                + "<p>Bạn có thể đăng nhập IMS Portal để xem thông tin chi tiết.</p>"
+                + "<p style='margin-top:24px;font-size:12px;color:#718096;'>Đây là email tự động, vui lòng không phản hồi.</p></div>";
+        sendHtml(recipientEmail, "Kết quả xét duyệt hồ sơ - IMS Portal", content);
+    }
+
+    private static void sendHtml(String recipientEmail, String subject, String htmlContent)
+            throws MessagingException, UnsupportedEncodingException {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", valueOr("IMS_SMTP_HOST", "smtp.gmail.com"));
+        props.put("mail.smtp.port", valueOr("IMS_SMTP_PORT", "587"));
+        props.put("mail.smtp.auth", "true"); props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.connectiontimeout", "10000"); props.put("mail.smtp.timeout", "15000");
+        String sender = value("IMS_SMTP_USER");
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(sender, value("IMS_SMTP_PASSWORD"));
+            }
+        });
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(sender, "IMS Portal - Quản lý Thực tập sinh"));
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
+        message.setSubject(subject); message.setContent(htmlContent, "text/html; charset=UTF-8");
+        Transport.send(message);
+    }
+
     private static String html(String text) {
         if (text == null) return "";
         return text.replace("&", "&amp;").replace("<", "&lt;")

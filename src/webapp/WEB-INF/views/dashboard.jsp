@@ -58,6 +58,9 @@
                 <i class="fa-solid fa-file-circle-check"></i>
                 <span>Duyệt tài liệu & CV</span>
             </a>
+            <a href="${pageContext.request.contextPath}/review-emails" class="menu-item">
+                <i class="fa-solid fa-envelope-circle-check"></i><span>Email kết quả</span>
+            </a>
 
             <div class="menu-group">
                 <button class="menu-group-toggle" type="button" aria-expanded="false"><i class="fa-solid fa-briefcase"></i><span>Quy trình thực tập</span><i class="fa-solid fa-chevron-down group-chevron"></i></button>
