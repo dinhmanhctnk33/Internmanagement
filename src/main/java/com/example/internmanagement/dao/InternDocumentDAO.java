@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,12 +51,17 @@ public class InternDocumentDAO {
      * Thêm mới một tài liệu (Thực tập sinh upload)
      */
     public void add(InternDocument document) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            add(conn, document);
+        }
+    }
+
+    public int add(Connection conn, InternDocument document) throws SQLException {
         String sql = "INSERT INTO intern_documents " +
                      "(intern_profile_id, document_type, file_name, file_url, file_size_bytes, approval_status, uploaded_at) " +
                      "VALUES (?, ?, ?, ?, ?, 'PENDING', ?)";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, document.getInternProfileId());
             ps.setString(2, document.getDocumentType());
@@ -72,6 +78,12 @@ public class InternDocumentDAO {
             ps.setTimestamp(6, Timestamp.valueOf(uploadedAt));
 
             ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1);
+                }
+            }
+            throw new SQLException("Không lấy được ID tài liệu sau khi thêm.");
         }
     }
 
@@ -79,18 +91,24 @@ public class InternDocumentDAO {
      * Cập nhật trạng thái duyệt tài liệu (Quản lý/Mentor duyệt)
      */
     public void review(int documentId, String approvalStatus, String rejectionNote, Long reviewerId) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            review(conn, documentId, approvalStatus, rejectionNote, reviewerId);
+        }
+    }
+
+    public boolean review(Connection conn, int documentId, String approvalStatus,
+                          String rejectionNote, Long reviewerId) throws SQLException {
         String sql = "UPDATE intern_documents " +
                      "SET approval_status = ?, rejection_note = ? " +
-                     "WHERE id = ?";
+                     "WHERE id = ? AND approval_status = 'PENDING'";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, approvalStatus);
             ps.setString(2, rejectionNote);
             ps.setInt(3, documentId);
 
-            ps.executeUpdate();
+            return ps.executeUpdate() == 1;
         }
     }
 
