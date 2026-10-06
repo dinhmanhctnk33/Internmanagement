@@ -380,20 +380,39 @@
 
 </div>
 
+<div class="password-reset-modal" id="passwordResetModal" hidden>
+    <div class="password-reset-backdrop" data-close-reset-modal></div>
+    <section class="password-reset-dialog" role="dialog" aria-modal="true" aria-labelledby="passwordResetTitle">
+        <button type="button" class="password-reset-close" data-close-reset-modal aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
+        <div class="password-reset-icon"><i class="fa-solid fa-key"></i></div>
+        <div class="password-reset-heading">
+            <p>Bảo mật tài khoản</p>
+            <h2 id="passwordResetTitle">Đặt lại mật khẩu</h2>
+            <span>Mật khẩu mới sẽ được áp dụng cho <strong id="passwordResetUsername"></strong>.</span>
+        </div>
+        <form id="passwordResetDialogForm" novalidate>
+            <label for="adminNewPassword">Mật khẩu mới</label>
+            <div class="password-reset-input">
+                <input id="adminNewPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Tối thiểu 6 ký tự">
+                <button type="button" data-toggle-password aria-label="Hiện mật khẩu"><i class="fa-regular fa-eye"></i></button>
+            </div>
+            <label for="adminConfirmPassword">Xác nhận mật khẩu</label>
+            <div class="password-reset-input">
+                <input id="adminConfirmPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Nhập lại mật khẩu mới">
+                <button type="button" data-toggle-password aria-label="Hiện mật khẩu"><i class="fa-regular fa-eye"></i></button>
+            </div>
+            <p class="password-reset-error" id="passwordResetError" aria-live="polite"></p>
+            <div class="password-reset-actions">
+                <button type="button" class="password-reset-cancel" data-close-reset-modal>Hủy</button>
+                <button type="submit" class="password-reset-submit"><i class="fa-solid fa-rotate"></i> Xác nhận reset</button>
+            </div>
+        </form>
+    </section>
+</div>
+
 <script>
     (() => { const button=document.getElementById('accountMenuButton'), menu=document.getElementById('accountMenu'); if(!button||!menu)return; const close=()=>{menu.hidden=true;button.setAttribute('aria-expanded','false');}; button.addEventListener('click',()=>{const open=menu.hidden;menu.hidden=!open;button.setAttribute('aria-expanded',String(open));}); document.addEventListener('click',event=>{if(!event.target.closest('.account-menu'))close();}); document.addEventListener('keydown',event=>{if(event.key==='Escape')close();}); })();
-    function resetUserPassword(form) {
-        const username = form.dataset.username || 'tài khoản này';
-        const newPassword = window.prompt('Nhập mật khẩu mới cho ' + username + ' (ít nhất 6 ký tự):');
-        if (newPassword === null) return false;
-        if (newPassword.length < 6) {
-            window.alert('Mật khẩu mới phải có ít nhất 6 ký tự.');
-            return false;
-        }
-        if (!window.confirm('Xác nhận đặt lại mật khẩu cho ' + username + '?')) return false;
-        form.querySelector('input[name="newPassword"]').value = newPassword;
-        return true;
-    }
 </script>
+<script src="${pageContext.request.contextPath}/frontend/js/admin-password-reset.js?v=20261007-1"></script>
 </body>
 </html>

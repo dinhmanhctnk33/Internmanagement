@@ -38,7 +38,7 @@
 
         <section class="bg-white md:w-7/12 p-8 md:p-10 flex flex-col justify-center">
             <div class="mb-6">
-                <p class="text-xs font-semibold text-action-accent uppercase tracking-wider mb-2">Bảo mật tài khoản</p>
+                <p class="text-sm font-semibold text-action-accent mb-2">Bảo mật tài khoản</p>
                 <h2 class="text-2xl font-bold text-brand-dark">Thiết lập mật khẩu mới</h2>
                 <p class="text-gray-500 text-sm mt-2">Nhập mật khẩu mới và xác nhận để hoàn tất.</p>
             </div>

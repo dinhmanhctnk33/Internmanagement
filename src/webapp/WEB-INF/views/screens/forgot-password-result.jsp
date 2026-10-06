@@ -35,7 +35,7 @@
                     <div class="w-12 h-12 rounded-full bg-green-100 text-green-700 flex items-center justify-center mb-5">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                     </div>
-                    <p class="text-xs font-semibold text-action-accent uppercase tracking-wider mb-2">Yêu cầu thành công</p>
+                    <p class="text-sm font-semibold text-action-accent mb-2">Yêu cầu thành công</p>
                     <h2 class="text-2xl font-bold text-brand-dark">Email đã được gửi</h2>
                     <p class="text-gray-500 text-sm mt-3 leading-relaxed">Liên kết đặt lại mật khẩu đã được gửi đến email của bạn. Liên kết có hiệu lực trong 24 giờ.</p>
                 </c:when>
@@ -43,7 +43,7 @@
                     <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mb-5">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/></svg>
                     </div>
-                    <p class="text-xs font-semibold text-red-600 uppercase tracking-wider mb-2">Không thể gửi email</p>
+                    <p class="text-sm font-semibold text-red-600 mb-2">Không thể gửi email</p>
                     <h2 class="text-2xl font-bold text-brand-dark">Yêu cầu đã được tạo</h2>
                     <p class="text-gray-500 text-sm mt-3 leading-relaxed">${emailError}</p>
                     <div class="mt-5 p-3 rounded-lg border alert-warning text-xs break-all">
