@@ -1,0 +1,5 @@
+{
+  "IMS_DB_URL": "jdbc:mysql://localhost:3306/internship_management?useUnicode=true&characterEncoding=UTF-8",
+  "IMS_DB_USER": "root",
+  "IMS_DB_PASSWORD": "@Manhctn123."
+}
