@@ -3,7 +3,8 @@ INSERT IGNORE INTO roles (id, role_code, role_name, description) VALUES
     (1, 'ADMIN',  'Quản trị viên', 'Quản trị hệ thống'),
     (2, 'HR',     'Phòng nhân sự', 'Quản lý nhân sự và TTS'),
     (3, 'MENTOR', 'Cán bộ Hướng dẫn', 'Hướng dẫn thực tập sinh'),
-    (4, 'INTERN', 'Thực tập sinh', 'Sinh viên thực tập');
+    (4, 'INTERN', 'Thực tập sinh', 'Sinh viên thực tập'),
+    (5, 'CANDIDATE', 'Ứng viên', 'Ứng viên đăng ký thực tập trực tuyến');
 
 INSERT IGNORE INTO permissions (permission_code, permission_name, module_group) VALUES
     ('INTERN_CREATE', 'Tạo hồ sơ thực tập sinh', 'INTERN'),

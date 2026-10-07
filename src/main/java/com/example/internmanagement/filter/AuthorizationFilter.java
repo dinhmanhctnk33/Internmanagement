@@ -7,7 +7,7 @@ import jakarta.servlet.http.*;
 import java.io.*; 
 import java.sql.*; 
 import java.util.*;
-@WebFilter(urlPatterns={"/interns/new","/interns/edit","/interns/import","/documents/review","/applications","/review-emails","/admin/*"})
+@WebFilter(urlPatterns={"/interns/new","/interns/edit","/interns/import","/documents/review","/applications","/candidate-files/*","/contracts","/contract-files/*","/review-emails","/programs","/admin/*"})
 public class AuthorizationFilter implements Filter {
  public void doFilter(ServletRequest request,ServletResponse response,FilterChain chain)throws IOException,ServletException {
     HttpServletRequest req=(HttpServletRequest)request;HttpServletResponse res=(HttpServletResponse)response;

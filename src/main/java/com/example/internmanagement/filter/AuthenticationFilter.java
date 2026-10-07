@@ -16,7 +16,7 @@ public class AuthenticationFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
         String path = req.getRequestURI().substring(req.getContextPath().length());
 
-        if (path.equals("/login") || path.equals("/forgot-pass") || path.equals("/forgot-password") || path.equals("/reset-password") || path.startsWith("/assets/") || path.startsWith("/frontend/")) {
+        if (path.equals("/login") || path.equals("/register") || path.equals("/forgot-pass") || path.equals("/forgot-password") || path.equals("/reset-password") || path.startsWith("/assets/") || path.startsWith("/frontend/")) {
             chain.doFilter(request, response);
             return;
         }

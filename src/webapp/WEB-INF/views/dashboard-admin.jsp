@@ -279,99 +279,6 @@
                 </div>
 
 
-                <!-- BẢNG DANH SÁCH TÀI KHOẢN HIỆN TẠI -->
-                <div class="card large-card" style="grid-column: span 2;">
-                    <div class="card-header">
-                        <div>
-                            <h3>Danh sách tài khoản hệ thống</h3>
-                            <p>Tất cả tài khoản Admin, HR, Mentor và Thực tập sinh</p>
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Tên đăng nhập</th>
-                                    <th>Họ và tên</th>
-                                    <th>Email</th>
-                                    <th>Vai trò</th>
-                                    <th>Trạng thái</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                 <c:choose>
-                                    <c:when test="${not empty users}">
-                                        <c:forEach var="u" items="${users}">
-                                            <tr>
-                                                <td>#${u.id}</td>
-                                                <td><strong>${u.username}</strong></td>
-                                                <td>${u.full_name}</td>
-                                                <td>${u.email}</td>
-                                                <td>
-                                                    <span class="badge ${u.role_code == 'ADMIN' ? 'active' : (u.role_code == 'HR' ? 'pending' : 'inactive')}">
-                                                        ${u.role_code}
-                                                    </span>
-                                                </td>
-                                                <td><span class="badge ${u.status == 'ACTIVE' ? 'active' : 'inactive'}"><i class="fa-solid ${u.status == 'ACTIVE' ? 'fa-check' : 'fa-lock'}"></i> ${u.status}</span></td>
-                                                <td>
-                                                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                                                        <form action="${pageContext.request.contextPath}/admin/users" method="post" onsubmit="return confirm('${u.status == 'ACTIVE' ? 'Khóa' : 'Kích hoạt'} tài khoản ${u.username}?');">
-                                                            <input type="hidden" name="action" value="change-status"><input type="hidden" name="userId" value="${u.id}"><input type="hidden" name="status" value="${u.status == 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'}">
-                                                            <button type="submit" class="outline-btn" style="padding:6px 9px;font-size:12px;">${u.status == 'ACTIVE' ? 'Khóa' : 'Kích hoạt'}</button>
-                                                        </form>
-                                                        <form action="${pageContext.request.contextPath}/admin/users" method="post" onsubmit="return resetUserPassword(this);" data-username="${u.username}">
-                                                            <input type="hidden" name="action" value="reset-password"><input type="hidden" name="userId" value="${u.id}"><input type="hidden" name="newPassword">
-                                                            <button type="submit" class="outline-btn" style="padding:6px 9px;font-size:12px;">Reset mật khẩu</button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <tr>
-                                            <td>#1</td>
-                                            <td><strong>admin_demo</strong></td>
-                                            <td>Quản trị viên Demo</td>
-                                            <td>admin.demo@ims.local</td>
-                                            <td><span class="badge active">ADMIN</span></td>
-                                            <td><span class="badge active"><i class="fa-solid fa-check"></i> ACTIVE</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>#2</td>
-                                            <td><strong>hr_demo</strong></td>
-                                            <td>Nhân sự Demo</td>
-                                            <td>hr.demo@ims.local</td>
-                                            <td><span class="badge pending">HR</span></td>
-                                            <td><span class="badge active"><i class="fa-solid fa-check"></i> ACTIVE</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>#3</td>
-                                            <td><strong>mentor_demo</strong></td>
-                                            <td>Mentor Demo</td>
-                                            <td>mentor.demo@ims.local</td>
-                                            <td><span class="badge inactive">MENTOR</span></td>
-                                            <td><span class="badge active"><i class="fa-solid fa-check"></i> ACTIVE</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>#4</td>
-                                            <td><strong>intern_demo</strong></td>
-                                            <td>Thực tập sinh Demo</td>
-                                            <td>intern.demo@ims.local</td>
-                                            <td><span class="badge inactive">INTERN</span></td>
-                                            <td><span class="badge active"><i class="fa-solid fa-check"></i> ACTIVE</span></td>
-                                        </tr>
-                                    </c:otherwise>
-                                </c:choose>
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div>
-
             </div>
 
         </section>
@@ -380,39 +287,8 @@
 
 </div>
 
-<div class="password-reset-modal" id="passwordResetModal" hidden>
-    <div class="password-reset-backdrop" data-close-reset-modal></div>
-    <section class="password-reset-dialog" role="dialog" aria-modal="true" aria-labelledby="passwordResetTitle">
-        <button type="button" class="password-reset-close" data-close-reset-modal aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
-        <div class="password-reset-icon"><i class="fa-solid fa-key"></i></div>
-        <div class="password-reset-heading">
-            <p>Bảo mật tài khoản</p>
-            <h2 id="passwordResetTitle">Đặt lại mật khẩu</h2>
-            <span>Mật khẩu mới sẽ được áp dụng cho <strong id="passwordResetUsername"></strong>.</span>
-        </div>
-        <form id="passwordResetDialogForm" novalidate>
-            <label for="adminNewPassword">Mật khẩu mới</label>
-            <div class="password-reset-input">
-                <input id="adminNewPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Tối thiểu 6 ký tự">
-                <button type="button" data-toggle-password aria-label="Hiện mật khẩu"><i class="fa-regular fa-eye"></i></button>
-            </div>
-            <label for="adminConfirmPassword">Xác nhận mật khẩu</label>
-            <div class="password-reset-input">
-                <input id="adminConfirmPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Nhập lại mật khẩu mới">
-                <button type="button" data-toggle-password aria-label="Hiện mật khẩu"><i class="fa-regular fa-eye"></i></button>
-            </div>
-            <p class="password-reset-error" id="passwordResetError" aria-live="polite"></p>
-            <div class="password-reset-actions">
-                <button type="button" class="password-reset-cancel" data-close-reset-modal>Hủy</button>
-                <button type="submit" class="password-reset-submit"><i class="fa-solid fa-rotate"></i> Xác nhận reset</button>
-            </div>
-        </form>
-    </section>
-</div>
-
 <script>
     (() => { const button=document.getElementById('accountMenuButton'), menu=document.getElementById('accountMenu'); if(!button||!menu)return; const close=()=>{menu.hidden=true;button.setAttribute('aria-expanded','false');}; button.addEventListener('click',()=>{const open=menu.hidden;menu.hidden=!open;button.setAttribute('aria-expanded',String(open));}); document.addEventListener('click',event=>{if(!event.target.closest('.account-menu'))close();}); document.addEventListener('keydown',event=>{if(event.key==='Escape')close();}); })();
 </script>
-<script src="${pageContext.request.contextPath}/frontend/js/admin-password-reset.js?v=20261007-1"></script>
 </body>
 </html>

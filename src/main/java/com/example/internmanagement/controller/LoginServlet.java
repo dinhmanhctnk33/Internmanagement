@@ -31,6 +31,9 @@ public class LoginServlet extends HttpServlet {
         if ("success".equals(request.getParameter("reset"))) {
             request.setAttribute("successMessage", "Đặt lại mật khẩu thành công. Bạn có thể đăng nhập bằng mật khẩu mới.");
         }
+        if ("1".equals(request.getParameter("registered"))) {
+            request.setAttribute("successMessage", "Đăng ký và nộp hồ sơ thành công. Bạn có thể đăng nhập để theo dõi kết quả.");
+        }
         request.getRequestDispatcher("/WEB-INF/views/login.jsp")
                .forward(request, response);
     }
@@ -78,7 +81,7 @@ public class LoginServlet extends HttpServlet {
             session.setMaxInactiveInterval(30 * 60);
 
             // Chuyển đến trang chủ
-            response.sendRedirect(request.getContextPath() + "/home");
+            response.sendRedirect(request.getContextPath() + ("CANDIDATE".equalsIgnoreCase(roleCode) ? "/my-application" : "/home"));
 
         } else {
 
