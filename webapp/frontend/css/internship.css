@@ -1,0 +1,225 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: #25313d;
+    background: #f3f6f8;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background: #fff;
+    border-bottom: 1px solid #dce4e8;
+}
+
+.header-container {
+    width: min(1100px, 100%);
+    min-height: 64px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo,
+.login-link {
+    color: #176b62;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.main {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.application-main {
+    align-items: flex-start;
+}
+
+.form-card,
+.application-card {
+    width: min(100%, 720px);
+    padding: 32px;
+    background: #fff;
+    border: 1px solid #e1e8eb;
+    border-radius: 8px;
+    box-shadow: 0 10px 28px rgb(27 56 65 / 8%);
+}
+
+.form-title {
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.form-title h1 {
+    margin: 0 0 10px;
+    color: #1f3038;
+    font-size: 28px;
+}
+
+.form-title p,
+.form-group small,
+.upload-box p {
+    color: #62717a;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label,
+.upload-box label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #cbd6db;
+    border-radius: 5px;
+    background: #fff;
+    font: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.upload-box input:focus {
+    outline: 2px solid rgb(23 107 98 / 20%);
+    border-color: #176b62;
+}
+
+.required {
+    color: #b42318;
+}
+
+.section {
+    padding-top: 20px;
+    border-top: 1px solid #e1e8eb;
+}
+
+.upload-box {
+    padding: 20px;
+    border: 1px dashed #9aafb5;
+    border-radius: 6px;
+    background: #f8fafb;
+}
+
+.upload-box input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd6db;
+    border-radius: 5px;
+    background: #fff;
+}
+
+.upload-box p {
+    margin: 8px 0 0;
+}
+
+.application-actions,
+.auth-actions,
+.form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-primary,
+.btn-secondary {
+    min-height: 44px;
+    padding: 0 20px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    color: #fff;
+    background: #176b62;
+}
+
+.btn-primary:hover {
+    background: #10564f;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    color: #34464d;
+    border-color: #cbd6db;
+    background: #fff;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 20px 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.checkbox-group input {
+    margin-top: 3px;
+}
+
+.footer {
+    padding: 18px;
+    color: #62717a;
+    font-size: 13px;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .header-container {
+        padding: 0 16px;
+    }
+
+    .main {
+        padding: 24px 14px;
+    }
+
+    .form-card,
+    .application-card {
+        padding: 24px 18px;
+    }
+
+    .form-title h1 {
+        font-size: 24px;
+    }
+
+    .application-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .application-actions > * {
+        justify-content: center;
+        width: 100%;
+    }
+}
