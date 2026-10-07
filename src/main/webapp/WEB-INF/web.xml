@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+    <servlet>
+        <servlet-name>internshipServlet</servlet-name>
+        <servlet-class>vn.internship.api.InternshipServlet</servlet-class>
+        <init-param>
+            <param-name>verificationUrlBase</param-name>
+            <param-value>https://localhost:8443/verify-email</param-value>
+        </init-param>
+        <init-param>
+            <param-name>verificationFrom</param-name>
+            <param-value>noreply@example.com</param-value>
+        </init-param>
+        <init-param>
+            <param-name>installSchema</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>internshipServlet</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>true</secure>
+        </cookie-config>
+    </session-config>
+    <resource-ref>
+        <res-ref-name>jdbc/InternshipDB</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+    <resource-ref>
+        <res-ref-name>mail/InternshipMail</res-ref-name>
+        <res-type>jakarta.mail.Session</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+</web-app>
