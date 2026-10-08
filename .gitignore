@@ -1,0 +1,28 @@
+# Build outputs
+target/
+out/
+*.class
+*.war
+
+# IDE and OS files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local runtime and dependencies
+tmp/
+node_modules/
+outputs/
+cookies.txt
+intern-uploads/
+
+# Local secrets
+src/main/resources/db-config.json
+.env
+.env.*
+!.env.example
+
+# Generated helper artifacts
+*.inspect.ndjson
