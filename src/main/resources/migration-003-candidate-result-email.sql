@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS candidate_result_email_queue (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  candidate_id BIGINT NOT NULL,
+  recipient_email VARCHAR(254) NOT NULL,
+  recipient_name VARCHAR(150) NOT NULL,
+  desired_position VARCHAR(150) NULL,
+  decision VARCHAR(20) NOT NULL,
+  decision_reason TEXT NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  attempt_count INT NOT NULL DEFAULT 0,
+  scheduled_at DATETIME NOT NULL,
+  next_attempt_at DATETIME NOT NULL,
+  sent_at DATETIME NULL,
+  last_error VARCHAR(1000) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT uq_result_email_candidate UNIQUE (candidate_id),
+  CONSTRAINT fk_result_email_candidate FOREIGN KEY (candidate_id) REFERENCES candidates(id),
+  CONSTRAINT chk_result_email_decision CHECK (decision IN ('PASSED','FAILED')),
+  CONSTRAINT chk_result_email_status CHECK (status IN ('PENDING','PROCESSING','SENT','FAILED','FAILED_FINAL','CANCELLED'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
