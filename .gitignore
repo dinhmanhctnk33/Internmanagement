@@ -28,3 +28,13 @@ src/main/resources/db-config.json
 
 # Generated helper artifacts
 *.inspect.ndjson
+
+# Local analysis documents and document-generation utilities
+Nghiệp vụ/
+*.docx
+tools/
+build_*backlog.mjs
+build_sprint3_*
+inspect_workbook.mjs
+render_sprint3_pdf.py
+update_theo_user_story_general.mjs
