@@ -64,15 +64,7 @@
             </a>
         </nav>
 
-        <div class="sidebar-bottom">
-            <a href="${pageContext.request.contextPath}/change-password" class="menu-item">
-                <i class="fa-solid fa-key"></i><span>Đổi mật khẩu</span>
-            </a>
-            <a href="${pageContext.request.contextPath}/logout" class="menu-item logout">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Đăng xuất</span>
-            </a>
-        </div>
+        
 
     </aside>
 

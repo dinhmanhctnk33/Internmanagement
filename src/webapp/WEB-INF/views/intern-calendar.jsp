@@ -6,7 +6,8 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Lịch thực tập của tôi - IMS</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261008-1">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/sprint2-schedule.css?v=20261008-3">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/sprint2-schedule.css?v=20261010-3">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/intern-header.css?v=20261008-1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
@@ -14,12 +15,12 @@
     <aside class="sidebar">
         <div class="logo"><div class="logo-icon"><i class="fa-solid fa-user-graduate"></i></div><div><h2>IMS Portal</h2><span>Dành cho Thực tập sinh</span></div></div>
         <nav class="menu"><p class="menu-title">TRANG CÁ NHÂN</p><a href="${pageContext.request.contextPath}/home" class="menu-item"><i class="fa-solid fa-house"></i><span>Trang cá nhân</span></a><a href="${pageContext.request.contextPath}/interns/profile" class="menu-item"><i class="fa-solid fa-id-card"></i><span>Hồ sơ của tôi</span></a><a href="${pageContext.request.contextPath}/my-contract" class="menu-item"><i class="fa-solid fa-file-contract"></i><span>Hợp đồng của tôi</span></a><a href="${pageContext.request.contextPath}/my-calendar" class="menu-item active"><i class="fa-solid fa-calendar-days"></i><span>Lịch thực tập</span></a><a href="${pageContext.request.contextPath}/attendance" class="menu-item"><i class="fa-solid fa-clock"></i><span>Check-in / Check-out</span></a></nav>
-        <div class="sidebar-bottom"><a href="${pageContext.request.contextPath}/change-password" class="menu-item"><i class="fa-solid fa-key"></i><span>Đổi mật khẩu</span></a><a href="${pageContext.request.contextPath}/logout" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất</span></a></div>
+        
     </aside>
     <main class="main">
-        <header class="header"><div class="header-context"><i class="fa-regular fa-calendar"></i><span>Kế hoạch cá nhân</span></div><div class="user"><div class="avatar">${currentUser.shortName}</div><div class="user-info"><strong><c:out value="${currentUser.fullName}"/></strong><small>Thực tập sinh</small></div></div></header>
+        <header class="header intern-header"><div class="header-context"><i class="fa-regular fa-calendar"></i><span>Kế hoạch cá nhân</span></div><div class="header-right"><div class="notification-wrap"><button class="notification" id="notificationButton" type="button" aria-label="Thông báo" aria-expanded="false"><i class="fa-regular fa-bell"></i></button><div class="notification-menu" id="notificationMenu" hidden><h3><i class="fa-solid fa-bell"></i> Thông báo</h3><div class="notification-empty">Xem các thông báo mới nhất của bạn.</div><a class="notification-item notification-all" href="${pageContext.request.contextPath}/notifications">Xem tất cả thông báo <i class="fa-solid fa-arrow-right"></i></a></div></div><div class="account-menu"><button class="account-trigger user" id="accountMenuButton" type="button" aria-expanded="false"><div class="avatar">${currentUser.shortName}</div><div class="user-info"><strong><c:out value="${currentUser.fullName}"/></strong><small>Thực tập sinh (INTERN)</small></div><i class="fa-solid fa-chevron-down account-chevron"></i></button><div class="account-dropdown" id="accountMenu" hidden><a href="${pageContext.request.contextPath}/change-password"><i class="fa-solid fa-key"></i> Đổi mật khẩu</a><a class="logout-link" href="${pageContext.request.contextPath}/logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></div></div></div></header>
         <section class="content schedule-page">
-            <div class="schedule-heading"><div><p class="eyebrow">KẾ HOẠCH CÁ NHÂN</p><h1>Lịch thực tập của tôi</h1><p>Theo dõi thời gian chương trình, hợp đồng và các mốc quan trọng trong cùng một lịch.</p></div><a class="today-action" href="${pageContext.request.contextPath}/my-calendar"><i class="fa-solid fa-location-crosshairs"></i> Tháng hiện tại</a></div>
+            <div class="schedule-heading"><div><p class="eyebrow">Kế hoạch cá nhân</p><h1>Lịch thực tập của tôi</h1><p>Theo dõi thời gian chương trình, hợp đồng và các mốc quan trọng trong cùng một lịch.</p></div><a class="today-action" href="${pageContext.request.contextPath}/my-calendar"><i class="fa-solid fa-location-crosshairs"></i> Tháng hiện tại</a></div>
             <c:choose>
                 <c:when test="${empty schedule}"><div class="schedule-card empty-state large"><i class="fa-regular fa-calendar-xmark"></i><h2>Chưa có lịch thực tập</h2><p>Hồ sơ thực tập chưa được thiết lập. Vui lòng liên hệ HR để được hỗ trợ.</p></div></c:when>
                 <c:otherwise>
@@ -43,5 +44,6 @@
         </section>
     </main>
 </div>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261008-1"></script>
 </body>
 </html>

@@ -31,7 +31,7 @@
             </c:otherwise>
         </c:choose>
     </nav>
-    <div class="sidebar-bottom"><a href="${pageContext.request.contextPath}/logout">Đăng xuất</a></div>
+    
 </aside>
 
 <main>

@@ -2,6 +2,7 @@ package com.example.internmanagement.controller;
 
 import com.example.internmanagement.util.DBConnection;
 import com.example.internmanagement.util.EmailUtility;
+import com.example.internmanagement.util.PasswordUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -152,7 +153,7 @@ public class AdminServlet extends HttpServlet {
                         "INSERT INTO users(username,password,email,full_name,status,create_at,update_at,c_password) "
                                 + "VALUES(?,?,?,?, 'ACTIVE',CURDATE(),CURDATE(),false)", Statement.RETURN_GENERATED_KEYS)) {
                     statement.setString(1, username);
-                    statement.setString(2, password);
+                    statement.setString(2, PasswordUtil.hash(password));
                     statement.setString(3, email);
                     statement.setString(4, fullName);
                     statement.executeUpdate();
@@ -225,7 +226,7 @@ public class AdminServlet extends HttpServlet {
             preventSelfManagement(request, userId);
             try (PreparedStatement statement = connection.prepareStatement(
                     "UPDATE users SET password = ?, c_password = false, act_token = NULL, ex_date_at = NULL, update_at = CURDATE() WHERE id = ?")) {
-                statement.setString(1, newPassword);
+                statement.setString(1, PasswordUtil.hash(newPassword));
                 statement.setInt(2, userId);
                 if (statement.executeUpdate() == 0) {
                     throw new IllegalArgumentException("Không tìm thấy tài khoản cần đặt lại mật khẩu.");

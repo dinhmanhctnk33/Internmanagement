@@ -7,7 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Danh sách Thực tập sinh - HR Portal</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261004-1">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261010-4">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/intern-header.css?v=20261010-2">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -27,16 +28,12 @@
             <a href="${pageContext.request.contextPath}/interns/new" class="menu-item"><i class="fa-solid fa-user-plus"></i><span>Thêm hồ sơ TTS</span></a>
             <a href="${pageContext.request.contextPath}/documents/review" class="menu-item"><i class="fa-solid fa-file-circle-check"></i><span>Duyệt tài liệu & CV</span></a>
         </nav>
-        <div class="sidebar-bottom">
-            <a href="${pageContext.request.contextPath}/logout" class="menu-item logout">
-                <i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất</span>
-            </a>
-        </div>
+        
     </aside>
 
     <!-- MAIN -->
     <main class="main">
-        <header class="header">
+        <header class="header intern-header">
             <form action="${pageContext.request.contextPath}/interns" method="get" style="display:flex;align-items:center;gap:10px;flex:1;">
                 <div class="search-box" style="flex:1;">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -57,13 +54,7 @@
                 </select>
                 <button type="submit" class="primary-btn" style="padding:9px 18px;"><i class="fa-solid fa-filter"></i> Lọc</button>
             </form>
-            <div class="header-right">
-                <div class="user">
-                    <div class="avatar">${currentUser.shortName}</div>
-                    <div class="user-info"><strong>${currentUser.fullName}</strong><small>HR Manager</small></div>
-                    <i class="fa-solid fa-chevron-down"></i>
-                </div>
-            </div>
+            <%@ include file="../includes/hr-header-actions.jspf" %>
         </header>
 
         <section class="content">
@@ -156,5 +147,6 @@
         </section>
     </main>
 </div>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261010-2"></script>
 </body>
 </html>

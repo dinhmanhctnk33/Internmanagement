@@ -1,6 +1,7 @@
 package com.example.internmanagement.controller;
 
 import com.example.internmanagement.util.DBConnection;
+import com.example.internmanagement.util.PasswordUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -36,7 +37,7 @@ public class RegisterServlet extends HttpServlet {
                         if(rs.next())roleId=rs.getInt(1);else{try(PreparedStatement i=c.prepareStatement("INSERT INTO roles(role_code,role_name,description) VALUES('CANDIDATE','Ứng viên','Ứng viên đăng ký trực tuyến')",Statement.RETURN_GENERATED_KEYS)){i.executeUpdate();try(ResultSet keys=i.getGeneratedKeys()){keys.next();roleId=keys.getInt(1);}}}
                     }
                     int userId;try(PreparedStatement s=c.prepareStatement("INSERT INTO users(username,password,email,full_name,status,create_at,update_at,phone_number) VALUES(?,?,?,?, 'ACTIVE',CURDATE(),CURDATE(),?)",Statement.RETURN_GENERATED_KEYS)){
-                        s.setString(1,email);s.setString(2,password);s.setString(3,email);s.setString(4,fullName);s.setString(5,phone);s.executeUpdate();try(ResultSet keys=s.getGeneratedKeys()){keys.next();userId=keys.getInt(1);}
+                        s.setString(1,email);s.setString(2,PasswordUtil.hash(password));s.setString(3,email);s.setString(4,fullName);s.setString(5,phone);s.executeUpdate();try(ResultSet keys=s.getGeneratedKeys()){keys.next();userId=keys.getInt(1);}
                     }
                     try(PreparedStatement s=c.prepareStatement("INSERT INTO user_roles(user_id,role_id) VALUES(?,?)")){s.setInt(1,userId);s.setInt(2,roleId);s.executeUpdate();}
                     try(PreparedStatement s=c.prepareStatement("INSERT INTO candidates(full_name,email,phone,university_name,major_name,desired_position,cv_file_url,application_status,applied_at) VALUES(?,?,?,?,?,?,?,'NEW',NOW())")){
@@ -49,8 +50,14 @@ public class RegisterServlet extends HttpServlet {
     }
     private String required(HttpServletRequest r,String n){String v=value(r,n);if(v.isBlank())throw new IllegalArgumentException("Vui lòng nhập đầy đủ thông tin bắt buộc.");return v;}
     private String value(HttpServletRequest r,String n){String v=r.getParameter(n);return v==null?"":v.trim();}
-    private void serveCv(HttpServletRequest req,HttpServletResponse resp)throws IOException{
+    private void serveCv(HttpServletRequest req,HttpServletResponse resp)throws IOException,ServletException{
         String info=req.getPathInfo();if(info==null||!info.matches("/[0-9a-fA-F-]{36}\\.pdf")){resp.sendError(404);return;}
+        String role=String.valueOf(req.getSession().getAttribute("userRole"));
+        if("CANDIDATE".equalsIgnoreCase(role)){
+            com.example.internmanagement.model.User user=(com.example.internmanagement.model.User)req.getSession().getAttribute("user");
+            String sql="SELECT 1 FROM candidates WHERE LOWER(email)=LOWER(?) AND SUBSTRING_INDEX(cv_file_url,'/',-1)=?";
+            try(Connection c=DBConnection.getConnection();PreparedStatement s=c.prepareStatement(sql)){s.setString(1,user.getEmail());s.setString(2,info.substring(1));try(ResultSet rs=s.executeQuery()){if(!rs.next()){resp.sendError(403);return;}}}catch(SQLException e){throw new ServletException("Không thể kiểm tra quyền xem CV.",e);}
+        }
         Path dir=Paths.get(System.getProperty("catalina.base",System.getProperty("java.io.tmpdir")),"candidate-uploads");Path file=dir.resolve(info.substring(1)).normalize();
         if(!file.startsWith(dir)||!Files.isRegularFile(file)){resp.sendError(404);return;}resp.setContentType("application/pdf");resp.setHeader("Content-Disposition","inline; filename=cv.pdf");resp.setContentLengthLong(Files.size(file));Files.copy(file,resp.getOutputStream());
     }

@@ -2,6 +2,7 @@ package com.example.internmanagement.controller;
 
 import com.example.internmanagement.dao.UserDAO;
 import com.example.internmanagement.model.User;
+import com.example.internmanagement.util.PasswordUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -32,7 +33,7 @@ public class ChangePasswordServlet extends HttpServlet {
         String currentPassword = value(request, "currentPassword");
         String newPassword = value(request, "newPassword");
         String confirmPassword = value(request, "confirmPassword");
-        if (!currentPassword.equals(user.getPassword())) {
+        if (!PasswordUtil.matches(currentPassword, user.getPassword())) {
             showForm(request, response, "Mật khẩu hiện tại không chính xác.");
             return;
         }
@@ -52,7 +53,7 @@ public class ChangePasswordServlet extends HttpServlet {
             showForm(request, response, "Không thể đổi mật khẩu. Vui lòng thử lại.");
             return;
         }
-        user.setPassword(newPassword);
+        user.setPassword(PasswordUtil.hash(newPassword));
         request.getSession().setAttribute("user", user);
         request.getSession().setAttribute("currentUser", user);
         response.sendRedirect(request.getContextPath() + "/change-password?success=1");

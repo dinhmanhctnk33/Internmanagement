@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý tài khoản hệ thống - IMS Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261004-1">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/intern-header.css?v=20261010-2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
@@ -21,10 +22,10 @@
             <p class="menu-title">HỆ THỐNG</p>
             <a href="${pageContext.request.contextPath}/home" class="menu-item"><i class="fa-solid fa-chart-line"></i><span>Bảng điều khiển chung</span></a>
         </nav>
-        <div class="sidebar-bottom"><a href="${pageContext.request.contextPath}/logout" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất</span></a></div>
+        
     </aside>
     <main class="main">
-        <header class="header"><div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Tìm kiếm tài khoản..."></div><div class="header-right"><div class="user"><div class="avatar">${currentUser.shortName}</div><div class="user-info"><strong>${currentUser.fullName}</strong><small>System Administrator</small></div></div></div></header>
+        <header class="header intern-header"><div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Tìm kiếm tài khoản..."></div><%@ include file="includes/hr-header-actions.jspf" %></header>
         <section class="content">
             <div class="page-title"><div><h1>Quản lý tài khoản hệ thống</h1><p>Khóa, kích hoạt và đặt lại mật khẩu cho các tài khoản người dùng.</p></div><a href="${pageContext.request.contextPath}/admin/users" class="primary-btn"><i class="fa-solid fa-user-plus"></i> Tạo tài khoản mới</a></div>
             <c:if test="${param.result == 'status-updated'}"><div style="background:var(--success-bg);color:var(--success-badge);border:1px solid var(--success-border);padding:12px 16px;border-radius:8px;margin-bottom:20px;font-weight:600;"><i class="fa-solid fa-circle-check"></i> Đã cập nhật trạng thái tài khoản.</div></c:if>
@@ -51,5 +52,6 @@
     </section>
 </div>
 <script src="${pageContext.request.contextPath}/frontend/js/admin-password-reset.js?v=20261007-1"></script>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261010-2"></script>
 </body>
 </html>

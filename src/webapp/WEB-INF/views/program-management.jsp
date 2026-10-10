@@ -7,7 +7,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Chương trình thực tập - IMS</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261008-1">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/sprint2-schedule.css?v=20261008-2">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/sprint2-schedule.css?v=20261010-3">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/intern-header.css?v=20261010-2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
@@ -25,12 +26,12 @@
             <a href="${pageContext.request.contextPath}/applications" class="menu-item"><i class="fa-solid fa-file-signature"></i><span>Xét duyệt hồ sơ</span></a>
             <a href="${pageContext.request.contextPath}/contracts" class="menu-item"><i class="fa-solid fa-file-contract"></i><span>Hợp đồng thực tập</span></a>
         </nav>
-        <div class="sidebar-bottom"><a href="${pageContext.request.contextPath}/change-password" class="menu-item"><i class="fa-solid fa-key"></i><span>Đổi mật khẩu</span></a><a href="${pageContext.request.contextPath}/logout" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất</span></a></div>
+        
     </aside>
     <main class="main">
-        <header class="header"><div class="header-context"><i class="fa-solid fa-calendar-check"></i><span>Quản lý kế hoạch thực tập</span></div><div class="user"><div class="avatar">${currentUser.shortName}</div><div class="user-info"><strong><c:out value="${currentUser.fullName}"/></strong><small>Nhân sự (HR)</small></div></div></header>
+        <header class="header intern-header"><div class="header-context"><i class="fa-solid fa-calendar-check"></i><span>Quản lý kế hoạch thực tập</span></div><%@ include file="includes/hr-header-actions.jspf" %></header>
         <section class="content schedule-page">
-            <div class="schedule-heading"><div><p class="eyebrow">KẾ HOẠCH THEO PHÒNG BAN</p><h1>Chương trình thực tập</h1><p>Tạo chương trình và quản lý chính xác ngày bắt đầu, ngày kết thúc của từng kỳ thực tập.</p></div><a class="primary-action" href="#create-program"><i class="fa-solid fa-plus"></i> Tạo chương trình</a></div>
+            <div class="schedule-heading"><div><p class="eyebrow">Kế hoạch theo phòng ban</p><h1>Chương trình thực tập</h1><p>Tạo chương trình và quản lý chính xác ngày bắt đầu, ngày kết thúc của từng kỳ thực tập.</p></div><a class="primary-action" href="#create-program"><i class="fa-solid fa-plus"></i> Tạo chương trình</a></div>
 
             <c:if test="${param.success == 'created'}"><div class="feedback success"><i class="fa-solid fa-circle-check"></i> Đã tạo chương trình thực tập thành công.</div></c:if>
             <c:if test="${param.success == 'updated'}"><div class="feedback success"><i class="fa-solid fa-circle-check"></i> Đã cập nhật thời gian chương trình.</div></c:if>
@@ -91,5 +92,6 @@ document.querySelectorAll('form').forEach(function(form){
   var end=form.querySelector('[name="endDate"]'); if(end)end.addEventListener('input',function(){this.setCustomValidity('');});
 });
 </script>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261010-2"></script>
 </body>
 </html>

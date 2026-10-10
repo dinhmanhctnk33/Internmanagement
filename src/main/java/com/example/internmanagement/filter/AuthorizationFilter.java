@@ -7,13 +7,19 @@ import jakarta.servlet.http.*;
 import java.io.*; 
 import java.sql.*; 
 import java.util.*;
-@WebFilter(urlPatterns={"/interns/new","/interns/edit","/interns/import","/documents/review","/applications","/candidate-files/*","/contracts","/contract-files/*","/review-emails","/programs","/admin/*"})
+@WebFilter(urlPatterns={"/interns/new","/interns/edit","/interns/import","/documents/review","/applications","/candidate-files/*","/contracts","/contract-files/*","/review-emails","/programs","/mentor-assignments","/attendance-report","/leave-requests","/admin/*"})
 public class AuthorizationFilter implements Filter {
  public void doFilter(ServletRequest request,ServletResponse response,FilterChain chain)throws IOException,ServletException {
     HttpServletRequest req=(HttpServletRequest)request;HttpServletResponse res=(HttpServletResponse)response;
     User u=(User)req.getSession().getAttribute("user");
+    if(u==null){res.sendRedirect(req.getContextPath()+"/login");return;}
     String path=req.getServletPath();
-    Set<String> allowed=path.startsWith("/admin/")?Set.of("ADMIN"):path.startsWith("/documents/review")?Set.of("HR","ADMIN"):Set.of("HR","ADMIN");try{if(!roles(u.getId()).stream().anyMatch(allowed::contains)){res.sendError(HttpServletResponse.SC_FORBIDDEN,"Bạn không có quyền sử dụng chức năng này.");
+    Set<String> allowed=path.startsWith("/admin/")?Set.of("ADMIN")
+            :path.startsWith("/contract-files")?Set.of("INTERN","HR","ADMIN")
+            :path.startsWith("/candidate-files")?Set.of("CANDIDATE","HR","ADMIN")
+            :path.startsWith("/leave-requests")?Set.of("INTERN","HR","ADMIN")
+            :path.startsWith("/documents/review")?Set.of("HR","ADMIN")
+            :Set.of("HR","ADMIN");try{if(!roles(u.getId()).stream().anyMatch(allowed::contains)){res.sendError(HttpServletResponse.SC_FORBIDDEN,"Bạn không có quyền sử dụng chức năng này.");
     return;
 }
 }catch(SQLException e){

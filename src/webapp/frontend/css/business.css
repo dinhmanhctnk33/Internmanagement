@@ -1,5 +1,6 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css');
 :root{--navy:#1b365d;--blue:#315f96;--blue2:#eaf2fb;--canvas:#f5f8fc;--card:#fff;--text:#26384f;--muted:#718096;--border:#dce5f0;--success:#237a52;--success-bg:#eaf8f1;--warning:#b86916;--warning-bg:#fff6e8;--danger:#c74444;--danger-bg:#fff0f0;--shadow:0 8px 24px rgba(24,55,91,.07)}
+.sidebar-bottom{display:none!important}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:var(--canvas);color:var(--text);font:14px/1.5 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif}button,input,select,textarea,table{font-family:inherit;font-size:inherit}
 aside{position:fixed;inset:0 auto 0 0;width:260px;padding:0 12px;background:var(--navy);color:#fff;display:flex;flex-direction:column;z-index:20;box-shadow:2px 0 12px rgba(13,33,58,.16)}
 aside>h2{height:78px;margin:0;padding:0 14px;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.1);font-size:19px}aside>h2:before{content:"\f19d";font-family:"Font Awesome 6 Free";font-weight:900;display:grid;place-items:center;width:42px;height:42px;margin-right:12px;border-radius:10px;background:var(--blue)}

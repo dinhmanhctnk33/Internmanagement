@@ -42,12 +42,22 @@ WHERE (u.username = 'admin_demo'  AND r.role_code = 'ADMIN')
    OR (u.username = 'mentor_demo' AND r.role_code = 'MENTOR')
    OR (u.username = 'intern_demo' AND r.role_code = 'INTERN');
 
+INSERT IGNORE INTO departments (id,dept_code,dept_name,is_active) VALUES
+    (1,'IT','Công nghệ thông tin',TRUE);
+
+INSERT IGNORE INTO internship_programs
+    (id,program_code,program_name,department_id,quota_count,start_date,end_date,status)
+VALUES (1,'DEMO-IT-2026','Chương trình thực tập CNTT 2026',1,10,'2026-10-01','2026-12-31','ACTIVE');
+
 -- Seed data cho intern_profiles
 INSERT IGNORE INTO intern_profiles (
     id, user_id, intern_code, identity_number, date_of_birth, gender, 
     address, university_name, major_name, phone_number, internship_status
 ) VALUES 
     (1, 4, 'TTS001', '001200001234', '2002-05-15', 'Nam', 'Hà Nội', 'ĐH Bách Khoa', 'Công nghệ thông tin', '0912345678', 'ACTIVE');
+
+UPDATE intern_profiles SET program_id=1,start_date='2026-10-01',end_date='2026-12-31'
+WHERE id=1 AND program_id IS NULL;
 
 -- Seed data cho intern_documents
 INSERT IGNORE INTO intern_documents (

@@ -1,5 +1,7 @@
 package com.example.internmanagement.controller;
 
+import com.example.internmanagement.util.PasswordUtil;
+
 import com.example.internmanagement.util.DBConnection;
 
 import jakarta.servlet.ServletException;
@@ -312,7 +314,7 @@ public class ResetPasswordServlet extends HttpServlet {
                         connection.prepareStatement(sql)
         ) {
 
-            statement.setString(1, newPassword);
+            statement.setString(1, PasswordUtil.hash(newPassword));
             statement.setString(2, token);
 
             int rowsUpdated =

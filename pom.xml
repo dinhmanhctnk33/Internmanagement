@@ -83,6 +83,11 @@
             <version>5.11.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -100,7 +105,7 @@
                 <version>3.14.0</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
-                    <fork>true</fork>
+                    <fork>false</fork>
                 </configuration>
             </plugin>
 

@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phân quyền hệ thống - IMS Admin</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261004-1">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/intern-header.css?v=20261010-2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         .rbac-layout { display:grid; grid-template-columns:280px 1fr; gap:24px; align-items:start; }
@@ -42,16 +43,13 @@
             <a href="${pageContext.request.contextPath}/home" class="menu-item"><i class="fa-solid fa-chart-line"></i><span>Bảng điều khiển chung</span></a>
             <a href="${pageContext.request.contextPath}/departments" class="menu-item"><i class="fa-solid fa-building"></i><span>Danh mục phòng ban</span></a>
         </nav>
-        <div class="sidebar-bottom"><a href="${pageContext.request.contextPath}/logout" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất</span></a></div>
+        
     </aside>
 
     <main class="main">
-        <header class="header">
+        <header class="header intern-header">
             <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Tìm kiếm tài khoản, quyền hạn..."></div>
-            <div class="header-right">
-                <a class="notification" href="${pageContext.request.contextPath}/notifications" aria-label="Thông báo"><i class="fa-regular fa-bell"></i><c:if test="${unreadNotificationCount > 0}"><span>${unreadNotificationCount}</span></c:if></a>
-                <div class="user"><div class="avatar">${currentUser.shortName != null ? currentUser.shortName : 'ADM'}</div><div class="user-info"><strong>${currentUser.fullName != null ? currentUser.fullName : 'Quản trị viên'}</strong><small>System Administrator (ADMIN)</small></div><i class="fa-solid fa-chevron-down"></i></div>
-            </div>
+            <%@ include file="includes/hr-header-actions.jspf" %>
         </header>
 
         <section class="content">
@@ -90,5 +88,6 @@
         </section>
     </main>
 </div>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261010-2"></script>
 </body>
 </html>

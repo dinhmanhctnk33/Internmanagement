@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${not empty intern ? 'Chỉnh sửa hồ sơ thực tập sinh' : 'Thêm mới hồ sơ thực tập sinh'} - IMS Portal</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261004-1">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/intern-header.css?v=20261010-2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         .form-grid { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:18px 22px; }
@@ -44,11 +45,11 @@
             <a href="${pageContext.request.contextPath}/interns/new" class="menu-item ${empty intern ? 'active' : ''}"><i class="fa-solid fa-user-plus"></i><span>Thêm hồ sơ TTS</span></a>
             <a href="${pageContext.request.contextPath}/documents/review" class="menu-item"><i class="fa-solid fa-file-circle-check"></i><span>Duyệt tài liệu &amp; CV</span></a>
         </nav>
-        <div class="sidebar-bottom"><a href="${pageContext.request.contextPath}/logout" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất</span></a></div>
+        
     </aside>
 
     <main class="main">
-        <header class="header"><div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Tìm kiếm thực tập sinh..."></div><div class="header-right"><div class="user"><div class="avatar">${currentUser.shortName}</div><div class="user-info"><strong>${currentUser.fullName}</strong><small>HR Manager</small></div><i class="fa-solid fa-chevron-down"></i></div></div></header>
+        <header class="header intern-header"><div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Tìm kiếm thực tập sinh..."></div><%@ include file="../includes/hr-header-actions.jspf" %></header>
         <section class="content">
             <div class="page-title">
                 <div><h1><i class="fa-solid fa-${not empty intern ? 'pen-to-square' : 'user-plus'}" style="color:var(--action-accent);margin-right:10px;"></i>${not empty intern ? 'Chỉnh sửa hồ sơ Thực tập sinh' : 'Thêm mới hồ sơ Thực tập sinh'}</h1><p>${not empty intern ? 'Cập nhật thông tin hồ sơ thực tập sinh' : 'Điền thông tin để tạo hồ sơ mới'}</p></div>
@@ -167,5 +168,6 @@
         document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !backdrop.hidden) close(); });
     })();
 </script>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261010-2"></script>
 </body>
 </html>

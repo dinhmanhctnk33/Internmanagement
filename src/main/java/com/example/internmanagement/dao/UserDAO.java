@@ -2,6 +2,7 @@ package com.example.internmanagement.dao;
 
 import com.example.internmanagement.model.User;
 import com.example.internmanagement.util.DBConnection;
+import com.example.internmanagement.util.PasswordUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -44,7 +45,6 @@ public class UserDAO {
                     phone_number
                 FROM users
                 WHERE (username = ? OR LOWER(email) = LOWER(?))
-                  AND password = ?
                   AND status = 'ACTIVE'
                 """;
 
@@ -56,13 +56,17 @@ public class UserDAO {
 
             statement.setString(1, identifier.trim());
             statement.setString(2, identifier.trim());
-            statement.setString(3, password);
-
             try (ResultSet rs = statement.executeQuery()) {
 
                 if (rs.next()) {
+                    String storedPassword = rs.getString("password");
+                    if (!PasswordUtil.matches(password, storedPassword)) return null;
 
                     User user = mapUser(rs);
+                    if (PasswordUtil.needsUpgrade(storedPassword)) {
+                        updatePassword(user.getId(), password);
+                        user.setPassword(PasswordUtil.hash(password));
+                    }
 
                     // Cập nhật thời gian đăng nhập
                     updateLastLogin(user.getId());
@@ -561,7 +565,7 @@ public class UserDAO {
 
             statement.setString(
                     1,
-                    newPassword
+                    PasswordUtil.hash(newPassword)
             );
 
             statement.setDate(

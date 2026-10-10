@@ -1,5 +1,7 @@
 # Build outputs
 target/
+.maven-repo/
+.worktrees/
 out/
 *.class
 *.war

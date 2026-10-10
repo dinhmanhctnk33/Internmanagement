@@ -253,8 +253,7 @@ table {
 }
 
 .sidebar-bottom {
-    padding: 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: none !important;
 }
 
 .logout {
@@ -329,6 +328,34 @@ table {
     display: flex;
     align-items: center;
     gap: 20px;
+    flex: 0 0 auto;
+    min-width: 0;
+}
+
+/* Header toolbars must shrink inside the main column instead of pushing the
+   account controls outside the viewport. */
+.header > form {
+    min-width: 0;
+}
+
+@media (max-width: 1450px) {
+    .header > form .search-box {
+        width: auto !important;
+        min-width: 140px;
+    }
+
+    .header > form select {
+        width: 175px !important;
+        flex-basis: 175px !important;
+    }
+
+    .header > form .primary-btn {
+        white-space: nowrap;
+    }
+
+    .intern-header .header-right {
+        gap: 12px;
+    }
 }
 
 .notification {

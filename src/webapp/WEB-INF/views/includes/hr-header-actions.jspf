@@ -1,0 +1,27 @@
+<div class="header-right">
+    <div class="notification-wrap">
+        <button class="notification" id="notificationButton" type="button" aria-label="Thông báo" aria-expanded="false">
+            <i class="fa-regular fa-bell"></i>
+            <c:if test="${unreadNotificationCount > 0}"><span id="notificationBadge">${unreadNotificationCount}</span></c:if>
+        </button>
+        <div class="notification-menu" id="notificationMenu" hidden>
+            <h3><i class="fa-solid fa-bell"></i> Thông báo</h3>
+            <c:choose>
+                <c:when test="${empty recentNotifications}"><div class="notification-empty">Chưa có thông báo mới.</div></c:when>
+                <c:otherwise><c:forEach var="item" items="${recentNotifications}"><a class="notification-item ${item.read ? '' : 'unread'}" href="${pageContext.request.contextPath}${not empty item.targetUrl ? item.targetUrl : '/home'}"><strong><c:out value="${item.title}"/></strong><span><c:out value="${item.message}"/></span></a></c:forEach></c:otherwise>
+            </c:choose>
+            <a class="notification-item notification-all" href="${pageContext.request.contextPath}/notifications">Xem tất cả thông báo <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="account-menu">
+        <button class="account-trigger user" id="accountMenuButton" type="button" aria-label="Mở menu tài khoản" aria-expanded="false">
+            <div class="avatar">${currentUser.shortName}</div>
+            <div class="user-info"><strong><c:out value="${currentUser.fullName}"/></strong><small>${sessionScope.userRole == 'ADMIN' ? 'Quản trị viên (ADMIN)' : sessionScope.userRole == 'INTERN' ? 'Thực tập sinh (INTERN)' : sessionScope.userRole == 'MENTOR' ? 'Mentor' : 'Nhân sự (HR)'}</small></div>
+            <i class="fa-solid fa-chevron-down account-chevron"></i>
+        </button>
+        <div class="account-dropdown" id="accountMenu" hidden>
+            <a href="${pageContext.request.contextPath}/change-password"><i class="fa-solid fa-key"></i> Đổi mật khẩu</a>
+            <a class="logout-link" href="${pageContext.request.contextPath}/logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+        </div>
+    </div>
+</div>
