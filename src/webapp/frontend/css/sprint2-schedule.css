@@ -14,3 +14,4 @@ body,.schedule-page,.schedule-page input,.schedule-page select,.schedule-page te
 @media(max-width:1450px){.program-row{grid-template-columns:minmax(0,1fr) 90px}.date-editor{grid-column:1/-1}.calendar-layout{grid-template-columns:1fr}.calendar-side{display:grid;grid-template-columns:1fr 1fr}}
 @media(max-width:850px){.program-row{grid-template-columns:1fr}.date-editor{grid-template-columns:1fr 1fr}.date-arrow{display:none}.save-dates{grid-column:1/-1}.calendar-side{grid-template-columns:1fr}}
 @media(max-width:560px){.date-editor{grid-template-columns:1fr}}
+.calendar-event.meeting{background:#e8f7ef;color:#24794f}.event-dot.meeting{background:#2f9667}
