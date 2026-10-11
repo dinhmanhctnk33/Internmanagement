@@ -1,6 +1,7 @@
 package com.example.internmanagement.controller;
 
 import com.example.internmanagement.model.User;
+import com.example.internmanagement.dao.NotificationDAO;
 import com.example.internmanagement.util.DBConnection;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -49,6 +50,9 @@ public class InternCalendarServlet extends HttpServlet {
             request.setAttribute("previousMonth", month.minusMonths(1).toString());
             request.setAttribute("nextMonth", month.plusMonths(1).toString());
             request.setAttribute("currentUser", user);
+            NotificationDAO notificationDAO=new NotificationDAO();
+            request.setAttribute("recentNotifications",notificationDAO.findRecent(user.getId(),5));
+            request.setAttribute("unreadNotificationCount",notificationDAO.unreadCount(user.getId()));
             request.getRequestDispatcher("/WEB-INF/views/intern-calendar.jsp").forward(request, response);
         } catch (SQLException exception) {
             throw new ServletException("Không thể tải lịch thực tập cá nhân.", exception);
@@ -98,6 +102,17 @@ public class InternCalendarServlet extends HttpServlet {
                     }
                 }
             }
+        }
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT m.title,m.meeting_date,m.start_time,m.end_time,m.meeting_mode,m.location_or_link,u.full_name creator_name " +
+                "FROM meeting_recipients mr JOIN meetings m ON m.id=mr.meeting_id JOIN users u ON u.id=m.creator_user_id " +
+                "WHERE mr.intern_profile_id=? AND mr.is_active=1 AND m.status='ACTIVE' ORDER BY m.meeting_date,m.start_time")) {
+            statement.setObject(1,schedule.get("profile_id"));
+            try(ResultSet result=statement.executeQuery()){while(result.next()){
+                String time=result.getTime("start_time").toString().substring(0,5)+"–"+result.getTime("end_time").toString().substring(0,5);
+                String place=result.getString("meeting_mode").equals("ONLINE")?"Trực tuyến: ":"Địa điểm: ";
+                addEvent(events,result.getDate("meeting_date"),time+" · "+result.getString("title"),"meeting",place+result.getString("location_or_link")+" · Tạo bởi "+result.getString("creator_name"));
+            }}
         }
         events.sort((first, second) -> String.valueOf(first.get("date")).compareTo(String.valueOf(second.get("date"))));
         return events;
