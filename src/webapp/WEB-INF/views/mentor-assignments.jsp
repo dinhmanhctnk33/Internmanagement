@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/mentor-assignments.css?v=20261008-1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/intern-header.css?v=20261010-2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>.assignment-action .unassign-form{display:block!important;flex:0 0 40px}</style>
 </head>
 <body>
 <div class="layout">
@@ -64,19 +65,16 @@
                                 <div class="program-info"><small>CHƯƠNG TRÌNH</small><strong><c:out value="${intern.program_name}" default="Chưa phân chương trình"/></strong><span><i class="fa-regular fa-building"></i> <c:out value="${intern.dept_name}" default="Chưa xác định phòng ban"/></span></div>
                                 <div class="current-mentor"><small>MENTOR HIỆN TẠI</small><c:choose><c:when test="${not empty intern.mentor_id}"><strong><i class="fa-solid fa-circle-check"></i> <c:out value="${intern.mentor_name}"/></strong><span><c:out value="${intern.mentor_code}"/></span></c:when><c:otherwise><strong class="unassigned"><i class="fa-regular fa-circle"></i> Chưa phân công</strong><span>Cần chọn người hướng dẫn</span></c:otherwise></c:choose></div>
                                 <div class="assignment-action">
-                                    <form method="post">
-                                        <input type="hidden" name="profileId" value="${intern.id}"><input type="hidden" name="action" value="assign">
-                                        <select name="mentorId" required aria-label="Chọn mentor cho ${intern.full_name}">
-                                            <option value="">Chọn mentor phù hợp</option>
-                                            <c:forEach items="${mentors}" var="mentor">
-                                                <c:set var="wrongDepartment" value="${not empty intern.department_id and not empty mentor.department_id and intern.department_id != mentor.department_id}"/>
-                                                <c:set var="fullMentor" value="${mentor.load_count >= mentor.max_capacity and intern.mentor_id != mentor.id}"/>
-                                                <option value="${mentor.id}" ${intern.mentor_id==mentor.id?'selected':''} ${wrongDepartment or fullMentor?'disabled':''}><c:out value="${mentor.full_name}"/> · <c:out value="${mentor.dept_name}" default="Liên phòng ban"/> · ${mentor.load_count}/${mentor.max_capacity}${wrongDepartment?' · khác phòng ban':fullMentor?' · đã đủ':''}</option>
-                                            </c:forEach>
-                                        </select>
-                                        <button type="submit"><i class="fa-solid fa-user-plus"></i> ${empty intern.mentor_id?'Phân công':'Cập nhật'}</button>
-                                    </form>
-                                    <c:if test="${not empty intern.mentor_id}"><form method="post" class="unassign-form" onsubmit="return confirm('Hủy phân công mentor của thực tập sinh này?')"><input type="hidden" name="profileId" value="${intern.id}"><input type="hidden" name="action" value="unassign"><button type="submit" title="Hủy phân công"><i class="fa-solid fa-link-slash"></i></button></form></c:if>
+                                    <button type="button" class="open-assignment"
+                                            data-profile-id="${intern.id}" data-mentor-id="${intern.mentor_id}"
+                                            data-department-id="${intern.department_id}"
+                                            data-intern-name="<c:out value='${intern.full_name}'/>"
+                                            data-intern-code="<c:out value='${intern.intern_code}'/>"
+                                            data-program-name="<c:out value='${intern.program_name}' default='Chưa phân chương trình'/>">
+                                        <i class="fa-solid ${empty intern.mentor_id?'fa-user-plus':'fa-arrows-rotate'}"></i>
+                                        ${empty intern.mentor_id?'Gán mentor':'Thay đổi'}
+                                    </button>
+                                    <c:if test="${not empty intern.mentor_id}"><form method="post" class="unassign-form" onsubmit="return confirm('Hủy phân công mentor của thực tập sinh này?')"><input type="hidden" name="profileId" value="${intern.id}"><input type="hidden" name="action" value="unassign"><input type="hidden" name="programId" value="${selectedProgramId}"><input type="hidden" name="assignment" value="${selectedAssignment}"><input type="hidden" name="q" value="<c:out value='${keyword}'/>"><button type="submit" title="Hủy phân công"><i class="fa-solid fa-link-slash"></i></button></form></c:if>
                                 </div>
                             </article>
                         </c:forEach>
@@ -101,6 +99,31 @@
         </section>
     </main>
 </div>
+<div class="assignment-modal" id="assignmentModal" hidden>
+    <div class="assignment-backdrop" data-close-assignment></div>
+    <section class="assignment-dialog" role="dialog" aria-modal="true" aria-labelledby="assignmentTitle">
+        <header><div><p>PHÂN CÔNG NGƯỜI HƯỚNG DẪN</p><h2 id="assignmentTitle">Chọn mentor phù hợp</h2></div><button type="button" data-close-assignment aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button></header>
+        <div class="selected-intern"><span><i class="fa-solid fa-user-graduate"></i></span><div><strong id="selectedInternName"></strong><small id="selectedInternMeta"></small></div></div>
+        <div class="recommendation-note"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Mentor cùng phòng ban và còn sức chứa được ưu tiên. Chọn một mentor để xem trước rồi xác nhận.</span></div>
+        <form method="post" id="assignmentForm">
+            <input type="hidden" name="profileId" id="assignmentProfileId"><input type="hidden" name="mentorId" id="assignmentMentorId"><input type="hidden" name="action" value="assign">
+            <input type="hidden" name="programId" value="${selectedProgramId}"><input type="hidden" name="assignment" value="${selectedAssignment}"><input type="hidden" name="q" value="<c:out value='${keyword}'/>">
+            <div class="mentor-choice-list">
+                <c:forEach items="${mentors}" var="mentor">
+                    <button type="button" class="mentor-choice" data-mentor-choice="${mentor.id}" data-department-id="${mentor.department_id}" data-load="${mentor.load_count}" data-capacity="${mentor.max_capacity}">
+                        <span class="mentor-choice-avatar"><i class="fa-solid fa-chalkboard-user"></i></span>
+                        <span class="mentor-choice-info"><strong><c:out value="${mentor.full_name}"/></strong><small><c:out value="${mentor.mentor_code}"/> · <c:out value="${mentor.dept_name}" default="Liên phòng ban"/></small></span>
+                        <span class="mentor-choice-load"><b>${mentor.load_count}/${mentor.max_capacity}</b><small>${mentor.load_count>=mentor.max_capacity?'Đã đủ':'Còn vị trí'}</small></span>
+                        <i class="fa-solid fa-circle-check choice-check"></i>
+                    </button>
+                </c:forEach>
+            </div>
+            <p class="no-compatible-mentor" hidden>Không có mentor phù hợp và còn sức chứa cho phòng ban này.</p>
+            <footer><button type="button" class="secondary" data-close-assignment>Đóng</button><button type="submit" class="confirm-assignment" disabled><i class="fa-solid fa-user-check"></i> Xác nhận phân công</button></footer>
+        </form>
+    </section>
+</div>
 <script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261010-2"></script>
+<script src="${pageContext.request.contextPath}/frontend/js/mentor-assignments.js?v=20261012-1"></script>
 </body>
 </html>
