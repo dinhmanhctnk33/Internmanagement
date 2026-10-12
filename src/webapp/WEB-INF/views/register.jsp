@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Đăng ký và nộp hồ sơ - IMS</title><link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/business.css?v=20261008-1"></head>
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Đăng ký và nộp hồ sơ - IMS</title><link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/business.css?v=20261012-3"></head>
 <body class="auth-page"><main class="auth-shell"><section class="auth-intro"><div class="auth-logo">IMS Portal</div><h1>Đăng ký ứng tuyển thực tập</h1><p>Tạo tài khoản và gửi hồ sơ trực tuyến trong một lần. HR sẽ phản hồi kết quả Đỗ/Trượt qua email đăng ký.</p><ul><li>Thông tin tài khoản và hồ sơ được lưu đồng thời</li><li>CV chỉ chấp nhận PDF, tối đa 8 MB</li><li>Theo dõi kết quả bằng email của bạn</li></ul></section>
 <section class="auth-card"><div class="auth-heading"><p>ỨNG VIÊN MỚI</p><h2>Đăng ký và nộp hồ sơ</h2><span>Đã có tài khoản? <a href="${pageContext.request.contextPath}/login">Đăng nhập</a></span></div>
 <% if(request.getAttribute("error")!=null){%><div class="alert error"><%=request.getAttribute("error")%></div><%}%>

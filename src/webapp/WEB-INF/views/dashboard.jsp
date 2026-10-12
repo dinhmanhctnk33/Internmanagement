@@ -9,8 +9,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bảng điều khiển Nhân sự (HR) - Quản lý Thực tập sinh</title>
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261004-1">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261012-3">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/style.css?v=20261012-3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         .account-menu { position:relative; }.account-trigger { display:flex; align-items:center; gap:12px; border:0; background:transparent; color:inherit; cursor:pointer; padding:5px 8px; border-radius:9px; text-align:left; }.account-trigger:hover,.account-trigger[aria-expanded="true"] { background:rgba(255,255,255,.09); }.account-dropdown { position:absolute; z-index:100; top:calc(100% + 10px); right:0; min-width:210px; padding:7px; border:1px solid #dce5f0; border-radius:10px; background:#fff; box-shadow:0 14px 30px rgba(17,45,78,.18); }.account-dropdown[hidden] { display:none; }.account-dropdown a { display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:7px; color:#234a7d; text-decoration:none; font-size:14px; font-weight:600; }.account-dropdown a:hover { background:#edf3fb; }.account-dropdown .logout-link { color:#bd3f3f; }

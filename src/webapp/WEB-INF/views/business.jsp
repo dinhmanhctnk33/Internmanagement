@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Nghiệp vụ thực tập - IMS</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/business.css?v=20261004-4">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/business.css?v=20261012-3">
 </head>
 <body>
 <aside>

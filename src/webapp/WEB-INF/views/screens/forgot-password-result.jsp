@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khôi phục mật khẩu - IMS Portal</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/style.css?v=20261012-3">
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
     <main class="bg-white rounded-xl shadow-2xl overflow-hidden max-w-4xl w-full flex flex-col md:flex-row min-h-[560px]">

@@ -1,5 +1,6 @@
 /* Import Tailwind CSS Base & Utilities */
 @import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* Custom Color Palette Variables & Utility Classes */
 :root {

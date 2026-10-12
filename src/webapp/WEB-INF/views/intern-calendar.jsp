@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Lịch thực tập của tôi - IMS</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261008-1">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261012-3">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/sprint2-schedule.css?v=20261010-3">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/intern-header.css?v=20261008-1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">

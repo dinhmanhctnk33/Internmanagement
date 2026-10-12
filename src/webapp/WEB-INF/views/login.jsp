@@ -7,7 +7,7 @@
     <title>Đăng nhập - Hệ thống Quản lý Thực tập sinh</title>
     
     <!-- Link tới file CSS riêng -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/style.css?v=20261012-3">
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
