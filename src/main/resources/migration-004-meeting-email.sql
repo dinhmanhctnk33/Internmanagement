@@ -59,4 +59,3 @@ CREATE TABLE IF NOT EXISTS meeting_email_queue (
 
 CREATE INDEX idx_meetings_datetime ON meetings(meeting_date,start_time);
 CREATE INDEX idx_meeting_email_due ON meeting_email_queue(status,next_attempt_at);
-
