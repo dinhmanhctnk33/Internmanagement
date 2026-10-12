@@ -25,6 +25,7 @@
             <a href="${pageContext.request.contextPath}/applications" class="menu-item"><i class="fa-solid fa-file-signature"></i><span>Xét duyệt hồ sơ</span></a>
             <a href="${pageContext.request.contextPath}/contracts" class="menu-item"><i class="fa-solid fa-file-contract"></i><span>Hợp đồng thực tập</span></a>
             <a href="${pageContext.request.contextPath}/mentor-assignments" class="menu-item active"><i class="fa-solid fa-user-group"></i><span>Phân công mentor</span></a>
+            <a href="${pageContext.request.contextPath}/meetings" class="menu-item"><i class="fa-solid fa-video"></i><span>Lịch họp</span></a>
             <a href="${pageContext.request.contextPath}/attendance-report" class="menu-item"><i class="fa-solid fa-chart-column"></i><span>Báo cáo chuyên cần</span></a>
         </nav>
         
