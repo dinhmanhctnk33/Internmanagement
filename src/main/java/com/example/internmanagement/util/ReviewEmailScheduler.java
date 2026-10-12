@@ -21,8 +21,8 @@ public class ReviewEmailScheduler implements ServletContextListener {
             thread.setDaemon(true); return thread;
         });
         executor.scheduleWithFixedDelay(() -> {
-            try { new ReviewEmailProcessor().processDue(); }
-            catch (Exception error) { event.getServletContext().log("Lỗi tiến trình gửi email kết quả", error); }
+            try { new ReviewEmailProcessor().processDue(); new MeetingEmailProcessor().processDue(); }
+            catch (Exception error) { event.getServletContext().log("Lỗi tiến trình gửi email tự động", error); }
         }, 20, 60, TimeUnit.SECONDS);
     }
 

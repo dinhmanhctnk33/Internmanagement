@@ -99,6 +99,7 @@ public class InternServlet extends HttpServlet {
             throws ServletException, IOException, SQLException {
         com.example.internmanagement.model.User user = (com.example.internmanagement.model.User) request.getSession().getAttribute("user");
         String role = (user != null && user.getRole() != null) ? user.getRole() : "INTERN";
+        if(user!=null){com.example.internmanagement.dao.NotificationDAO notificationDAO=new com.example.internmanagement.dao.NotificationDAO();request.setAttribute("recentNotifications",notificationDAO.findRecent(user.getId(),5));request.setAttribute("unreadNotificationCount",notificationDAO.unreadCount(user.getId()));}
 
         if ("ADMIN".equalsIgnoreCase(role)) {
             // Load danh sách user với role_code để dashboard-admin.jsp hiển thị

@@ -64,6 +64,33 @@ public class EmailUtility {
         sendHtml(recipientEmail, "Thông báo kết quả ứng tuyển thực tập - IMS Portal", content);
     }
 
+    public static void sendMeetingEmail(String recipientEmail, String recipientName, String emailType,
+            String title, String meetingDate, String startTime, String endTime, String mode,
+            String locationOrLink, String description) throws MessagingException, UnsupportedEncodingException {
+        if (!isConfigured()) throw new MessagingException("SMTP chưa được cấu hình.");
+        String action = switch (emailType) {
+            case "CANCELLATION" -> "LỊCH HỌP ĐÃ HỦY";
+            case "UPDATE" -> "LỊCH HỌP ĐÃ CẬP NHẬT";
+            default -> "THƯ MỜI LỊCH HỌP";
+        };
+        String color = "CANCELLATION".equals(emailType) ? "#b42318" : "#315f96";
+        String content = "<div style='font-family:Arial,sans-serif;max-width:620px;margin:auto;padding:28px;border:1px solid #dce5f0;border-radius:14px;color:#243b57;'>"
+                + "<h2 style='margin:0 0 18px;color:#173d70;'>IMS Portal</h2><p>Chào " + html(recipientName) + ",</p>"
+                + "<div style='padding:12px 16px;border-left:4px solid " + color + ";background:#f4f7fb;color:" + color + ";font-weight:bold;'>" + action + "</div>"
+                + "<h3 style='margin:20px 0 12px;'>" + html(title) + "</h3><table style='width:100%;border-collapse:collapse'>"
+                + row("Thời gian", meetingDate + " · " + startTime + " – " + endTime)
+                + row("Hình thức", "ONLINE".equals(mode) ? "Trực tuyến" : "Trực tiếp")
+                + row("Liên kết/Địa điểm", locationOrLink) + "</table>"
+                + (description == null || description.isBlank() ? "" : "<p><strong>Mô tả:</strong><br>" + html(description) + "</p>")
+                + "<p style='margin-top:24px;font-size:12px;color:#718096;'>Đây là email tự động, vui lòng không phản hồi.</p></div>";
+        sendHtml(recipientEmail, action + " - " + title, content);
+    }
+
+    private static String row(String label, String value) {
+        return "<tr><td style='padding:9px;border-bottom:1px solid #e5e7eb;color:#64748b;width:34%;'>" + html(label)
+                + "</td><td style='padding:9px;border-bottom:1px solid #e5e7eb;font-weight:bold;'>" + html(value) + "</td></tr>";
+    }
+
     private static void sendHtml(String recipientEmail, String subject, String htmlContent)
             throws MessagingException, UnsupportedEncodingException {
         Properties props = new Properties();
