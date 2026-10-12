@@ -1,5 +1,6 @@
 package com.example.internmanagement.controller;
 
+import com.example.internmanagement.model.User;
 import com.example.internmanagement.util.DBConnection;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -66,10 +67,12 @@ public class MentorAssignmentServlet extends HttpServlet {
             try {
                 long profileId = requiredId(request.getParameter("profileId"), "Thực tập sinh không hợp lệ.");
                 if ("unassign".equals(action)) {
-                    unassign(connection, profileId);
-                } else {
+                    unassign(connection, profileId, currentUserId(request), request.getRemoteAddr());
+                } else if ("assign".equals(action)) {
                     long mentorId = requiredId(request.getParameter("mentorId"), "Vui lòng chọn mentor.");
-                    assign(connection, profileId, mentorId);
+                    assign(connection, profileId, mentorId, currentUserId(request), request.getRemoteAddr());
+                } else {
+                    throw new IllegalArgumentException("Thao tác phân công không hợp lệ.");
                 }
                 connection.commit();
                 redirect(response, request, "success=" + ("unassign".equals(action) ? "unassigned" : "assigned"));
@@ -87,7 +90,8 @@ public class MentorAssignmentServlet extends HttpServlet {
         }
     }
 
-    private void assign(Connection connection, long profileId, long mentorId) throws SQLException {
+    private void assign(Connection connection, long profileId, long mentorId, long actorId, String ipAddress)
+            throws SQLException {
         Map<String, Object> intern = lockIntern(connection, profileId);
         Map<String, Object> mentor = lockMentor(connection, mentorId);
         Long programDepartment = asLong(intern.get("department_id"));
@@ -97,6 +101,7 @@ public class MentorAssignmentServlet extends HttpServlet {
         }
 
         long currentMentorId = asLong(intern.get("mentor_id")) == null ? -1 : asLong(intern.get("mentor_id"));
+        if (currentMentorId == mentorId) return;
         if (currentMentorId != mentorId) {
             int currentLoad = mentorLoad(connection, mentorId, profileId);
             int maxCapacity = ((Number) mentor.get("max_capacity")).intValue();
@@ -113,10 +118,23 @@ public class MentorAssignmentServlet extends HttpServlet {
                 throw new IllegalArgumentException("Không tìm thấy thực tập sinh đang hoạt động.");
             }
         }
+        Long previousMentorId = asLong(intern.get("mentor_id"));
+        notifyUser(connection, asLong(intern.get("intern_user_id")), "Cập nhật người hướng dẫn",
+                "Bạn đã được phân công mentor " + mentor.get("full_name") + ".", "/home");
+        notifyUser(connection, asLong(mentor.get("mentor_user_id")), "Phân công thực tập sinh",
+                "Bạn được phân công hướng dẫn thực tập sinh " + intern.get("intern_name") + ".", "/home");
+        if (previousMentorId != null && previousMentorId != mentorId) {
+            notifyPreviousMentor(connection, previousMentorId, String.valueOf(intern.get("intern_name")));
+        }
+        writeAudit(connection, actorId, profileId, previousMentorId, mentorId, ipAddress);
     }
 
-    private void unassign(Connection connection, long profileId) throws SQLException {
-        lockIntern(connection, profileId);
+    private void unassign(Connection connection, long profileId, long actorId, String ipAddress) throws SQLException {
+        Map<String, Object> intern = lockIntern(connection, profileId);
+        Long previousMentorId = asLong(intern.get("mentor_id"));
+        if (previousMentorId == null) {
+            throw new IllegalArgumentException("Thực tập sinh hiện chưa được phân công mentor.");
+        }
         try (PreparedStatement statement = connection.prepareStatement(
                 "UPDATE intern_profiles SET mentor_id=NULL WHERE id=? AND internship_status='ACTIVE'")) {
             statement.setLong(1, profileId);
@@ -124,10 +142,15 @@ public class MentorAssignmentServlet extends HttpServlet {
                 throw new IllegalArgumentException("Không tìm thấy thực tập sinh đang hoạt động.");
             }
         }
+        notifyUser(connection, asLong(intern.get("intern_user_id")), "Cập nhật người hướng dẫn",
+                "Phân công mentor của bạn đã được HR hủy.", "/home");
+        notifyPreviousMentor(connection, previousMentorId, String.valueOf(intern.get("intern_name")));
+        writeAudit(connection, actorId, profileId, previousMentorId, null, ipAddress);
     }
 
     private Map<String, Object> lockIntern(Connection connection, long profileId) throws SQLException {
-        String sql = "SELECT ip.id,ip.mentor_id,p.department_id FROM intern_profiles ip "
+        String sql = "SELECT ip.id,ip.mentor_id,p.department_id,u.id intern_user_id,u.full_name intern_name FROM intern_profiles ip "
+                + "JOIN users u ON u.id=ip.user_id "
                 + "LEFT JOIN internship_programs p ON p.id=ip.program_id "
                 + "WHERE ip.id=? AND ip.internship_status='ACTIVE' FOR UPDATE";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -140,7 +163,7 @@ public class MentorAssignmentServlet extends HttpServlet {
     }
 
     private Map<String, Object> lockMentor(Connection connection, long mentorId) throws SQLException {
-        String sql = "SELECT m.id,m.department_id mentor_department_id,m.max_capacity,m.status,u.full_name "
+        String sql = "SELECT m.id,m.department_id mentor_department_id,m.max_capacity,m.status,u.id mentor_user_id,u.full_name "
                 + "FROM mentors m JOIN users u ON u.id=m.user_id WHERE m.id=? FOR UPDATE";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, mentorId);
@@ -164,6 +187,46 @@ public class MentorAssignmentServlet extends HttpServlet {
                 result.next();
                 return result.getInt(1);
             }
+        }
+    }
+
+    private void notifyPreviousMentor(Connection connection, long mentorId, String internName) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT user_id FROM mentors WHERE id=?")) {
+            statement.setLong(1, mentorId);
+            try (ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    notifyUser(connection, result.getLong("user_id"), "Cập nhật phân công hướng dẫn",
+                            "Bạn không còn phụ trách thực tập sinh " + internName + ".", "/home");
+                }
+            }
+        }
+    }
+
+    private void notifyUser(Connection connection, Long userId, String title, String message, String targetUrl)
+            throws SQLException {
+        if (userId == null) return;
+        try (PreparedStatement statement = connection.prepareStatement(
+                "INSERT INTO notifications(user_id,title,message,target_url,is_read) VALUES(?,?,?,?,0)")) {
+            statement.setLong(1, userId);
+            statement.setString(2, title);
+            statement.setString(3, message);
+            statement.setString(4, targetUrl);
+            statement.executeUpdate();
+        }
+    }
+
+    private void writeAudit(Connection connection, long actorId, long profileId, Long oldMentorId,
+                            Long newMentorId, String ipAddress) throws SQLException {
+        String sql = "INSERT INTO audit_logs(user_id,action_code,table_name,record_id,old_values_json,new_values_json,ip_address) "
+                + "VALUES(?,'ASSIGN_MENTOR','intern_profiles',?,JSON_OBJECT('mentor_id',?),JSON_OBJECT('mentor_id',?),?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, actorId);
+            statement.setLong(2, profileId);
+            setNullableLong(statement, 3, oldMentorId);
+            setNullableLong(statement, 4, newMentorId);
+            statement.setString(5, ipAddress);
+            statement.executeUpdate();
         }
     }
 
@@ -278,7 +341,23 @@ public class MentorAssignmentServlet extends HttpServlet {
     }
 
     private void redirect(HttpServletResponse response, HttpServletRequest request, String query) throws IOException {
-        response.sendRedirect(request.getContextPath() + "/mentor-assignments?" + query);
+        StringBuilder target = new StringBuilder(request.getContextPath()).append("/mentor-assignments?").append(query);
+        appendQuery(target, "programId", request.getParameter("programId"));
+        appendQuery(target, "assignment", request.getParameter("assignment"));
+        appendQuery(target, "q", request.getParameter("q"));
+        response.sendRedirect(target.toString());
+    }
+
+    private void appendQuery(StringBuilder target, String name, String value) {
+        if (value != null && !value.isBlank()) {
+            target.append('&').append(name).append('=').append(URLEncoder.encode(value, StandardCharsets.UTF_8));
+        }
+    }
+
+    private long currentUserId(HttpServletRequest request) {
+        Object currentUser = request.getSession().getAttribute("user");
+        if (currentUser instanceof User user) return user.getId();
+        throw new IllegalArgumentException("Phiên đăng nhập không hợp lệ.");
     }
 
     private boolean isHrOrAdmin(HttpServletRequest request) {
