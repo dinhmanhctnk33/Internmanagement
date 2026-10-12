@@ -147,6 +147,8 @@ public class InternServlet extends HttpServlet {
                 }
             }
             request.getRequestDispatcher("/WEB-INF/views/dashboard-intern.jsp").forward(request, response);
+        } else if ("MENTOR".equalsIgnoreCase(role)) {
+            response.sendRedirect(request.getContextPath() + "/mentor/dashboard");
         } else {
             String keyword = request.getParameter("q");
             String university = request.getParameter("university");
