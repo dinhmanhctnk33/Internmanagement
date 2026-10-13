@@ -1,0 +1,17 @@
+<aside class="sidebar">
+    <div class="logo"><div class="logo-icon"><i class="fa-solid fa-user-tie"></i></div><div><h2>IMS Portal</h2><span>Phòng Nhân sự (HR)</span></div></div>
+    <nav class="menu">
+        <p class="menu-title">NGHIỆP VỤ HR</p>
+        <a href="${pageContext.request.contextPath}/home" class="menu-item"><i class="fa-solid fa-chart-line"></i><span>Dashboard HR</span></a>
+        <a href="${pageContext.request.contextPath}/interns" class="menu-item"><i class="fa-solid fa-users"></i><span>Thực tập sinh &amp; Lọc</span></a>
+        <a href="${pageContext.request.contextPath}/documents/review" class="menu-item"><i class="fa-solid fa-file-circle-check"></i><span>Duyệt tài liệu &amp; CV</span></a>
+        <a href="${pageContext.request.contextPath}/review-emails" class="menu-item"><i class="fa-solid fa-envelope-circle-check"></i><span>Email kết quả</span></a>
+        <p class="menu-title">QUY TRÌNH THỰC TẬP</p>
+        <a href="${pageContext.request.contextPath}/programs" class="menu-item"><i class="fa-solid fa-calendar-days"></i><span>Chương trình thực tập</span></a>
+        <a href="${pageContext.request.contextPath}/applications" class="menu-item"><i class="fa-solid fa-file-signature"></i><span>Xét duyệt hồ sơ</span></a>
+        <a href="${pageContext.request.contextPath}/contracts" class="menu-item"><i class="fa-solid fa-file-contract"></i><span>Hợp đồng thực tập</span></a>
+        <a href="${pageContext.request.contextPath}/attendance-report" class="menu-item"><i class="fa-solid fa-chart-column"></i><span>Báo cáo chuyên cần</span></a>
+        <a href="${pageContext.request.contextPath}/final-reports" class="menu-item ${activeMenu == 'reports' ? 'active' : ''}"><i class="fa-solid fa-file-lines"></i><span>Báo cáo cuối kỳ</span></a>
+        <a href="${pageContext.request.contextPath}/report-recipients" class="menu-item ${activeMenu == 'recipients' ? 'active' : ''}"><i class="fa-solid fa-address-book"></i><span>Danh bạ người nhận</span></a>
+    </nav>
+</aside>

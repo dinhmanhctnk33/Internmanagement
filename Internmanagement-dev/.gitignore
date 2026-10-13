@@ -1,0 +1,40 @@
+# Build outputs
+target/
+.maven-repo/
+.worktrees/
+out/
+*.class
+*.war
+
+# IDE and OS files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local runtime and dependencies
+tmp/
+node_modules/
+outputs/
+cookies.txt
+intern-uploads/
+
+# Local secrets
+src/main/resources/db-config.json
+.env
+.env.*
+!.env.example
+
+# Generated helper artifacts
+*.inspect.ndjson
+
+# Local analysis documents and document-generation utilities
+Nghiệp vụ/
+*.docx
+tools/
+build_*backlog.mjs
+build_sprint3_*
+inspect_workbook.mjs
+render_sprint3_pdf.py
+update_theo_user_story_general.mjs
