@@ -1,5 +1,6 @@
 # Build outputs
 target/
+local-data/
 .maven-repo/
 .worktrees/
 out/

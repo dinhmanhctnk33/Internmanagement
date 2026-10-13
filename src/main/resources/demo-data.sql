@@ -49,6 +49,9 @@ INSERT IGNORE INTO internship_programs
     (id,program_code,program_name,department_id,quota_count,start_date,end_date,status)
 VALUES (1,'DEMO-IT-2026','Chương trình thực tập CNTT 2026',1,10,'2026-10-01','2026-12-31','ACTIVE');
 
+INSERT IGNORE INTO mentors (id, user_id, mentor_code, department_id, job_title, max_capacity, status)
+VALUES (1, 3, 'MENTOR-001', 1, 'Mentor Demo', 5, 'ACTIVE');
+
 -- Seed data cho intern_profiles
 INSERT IGNORE INTO intern_profiles (
     id, user_id, intern_code, identity_number, date_of_birth, gender, 
@@ -56,8 +59,8 @@ INSERT IGNORE INTO intern_profiles (
 ) VALUES 
     (1, 4, 'TTS001', '001200001234', '2002-05-15', 'Nam', 'Hà Nội', 'ĐH Bách Khoa', 'Công nghệ thông tin', '0912345678', 'ACTIVE');
 
-UPDATE intern_profiles SET program_id=1,start_date='2026-10-01',end_date='2026-12-31'
-WHERE id=1 AND program_id IS NULL;
+UPDATE intern_profiles SET program_id=1,start_date='2026-10-01',end_date='2026-12-31', mentor_id = 1
+WHERE id=1 AND (program_id IS NULL OR mentor_id IS NULL);
 
 -- Seed data cho intern_documents
 INSERT IGNORE INTO intern_documents (

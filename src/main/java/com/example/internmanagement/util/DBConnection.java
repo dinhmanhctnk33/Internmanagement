@@ -16,15 +16,23 @@ import java.util.stream.Collectors;
 
 public class DBConnection {
 
+    private static final Map<String, String> jsonConfig = loadJsonConfig("db-config.json");
+
     static {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            String url = System.getenv("IMS_DB_URL");
+            if (url == null || url.isBlank()) {
+                url = jsonConfig.get("IMS_DB_URL");
+            }
+            if (url != null && url.startsWith("jdbc:h2:")) {
+                Class.forName("org.h2.Driver");
+            } else {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
-
-    private static final Map<String, String> jsonConfig = loadJsonConfig("db-config.json");
 
     // 1. Đọc file config.json từ thư mục resources
     private static Map<String, String> loadJsonConfig(String fileName) {
