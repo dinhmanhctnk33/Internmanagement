@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 @WebFilter("/*")
 public class AuthenticationFilter implements Filter {
 
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
@@ -30,6 +31,12 @@ public class AuthenticationFilter implements Filter {
 
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("user") == null) {
+            if (path.startsWith("/api/")) {
+                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                res.setContentType("application/json");
+                res.getWriter().write("{\"error\":\"Vui lòng đăng nhập.\"}");
+                return;
+            }
             res.sendRedirect(req.getContextPath() + "/login");
             return;
         }
