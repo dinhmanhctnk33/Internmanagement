@@ -3,7 +3,8 @@ INSERT IGNORE INTO roles (id, role_code, role_name, description) VALUES
     (1, 'ADMIN',  'Quản trị viên', 'Quản trị hệ thống'),
     (2, 'HR',     'Phòng nhân sự', 'Quản lý nhân sự và TTS'),
     (3, 'MENTOR', 'Cán bộ Hướng dẫn', 'Hướng dẫn thực tập sinh'),
-    (4, 'INTERN', 'Thực tập sinh', 'Sinh viên thực tập');
+    (4, 'INTERN', 'Thực tập sinh', 'Sinh viên thực tập'),
+    (5, 'CANDIDATE', 'Ứng viên', 'Ứng viên đăng ký chương trình thực tập');
 
 INSERT IGNORE INTO permissions (permission_code, permission_name, module_group) VALUES
     ('INTERN_CREATE', 'Tạo hồ sơ thực tập sinh', 'INTERN'),
@@ -41,12 +42,27 @@ WHERE (u.username = 'admin_demo'  AND r.role_code = 'ADMIN')
    OR (u.username = 'mentor_demo' AND r.role_code = 'MENTOR')
    OR (u.username = 'intern_demo' AND r.role_code = 'INTERN');
 
+INSERT IGNORE INTO departments (id, dept_code, dept_name, head_name, is_active)
+VALUES (1, 'IT', 'Phòng Công nghệ Thông tin', 'Quản trị viên Demo', TRUE);
+
+INSERT IGNORE INTO internship_programs (
+    id, program_code, program_name, department_id, quota_count, start_date, end_date, description, status
+) VALUES (
+    1, 'TTS-2026-Q1', 'Đợt thực tập 2026 Q1', 1, 20, '2026-01-15', '2026-06-30', 'Đợt thực tập demo cho sinh viên', 'ACTIVE'
+);
+
+INSERT IGNORE INTO mentors (
+    id, user_id, mentor_code, department_id, job_title, max_capacity, status
+) VALUES (
+    1, 3, 'MENTOR-001', 1, 'Mentor Backend', 5, 'ACTIVE'
+);
+
 -- Seed data cho intern_profiles
 INSERT IGNORE INTO intern_profiles (
     id, user_id, intern_code, identity_number, date_of_birth, gender, 
-    address, university_name, major_name, phone_number, internship_status
+    address, university_name, major_name, program_id, mentor_id, phone_number, internship_status
 ) VALUES 
-    (1, 4, 'TTS001', '001200001234', '2002-05-15', 'Nam', 'Hà Nội', 'ĐH Bách Khoa', 'Công nghệ thông tin', '0912345678', 'ACTIVE');
+    (1, 4, 'TTS001', '001200001234', '2002-05-15', 'Nam', 'Hà Nội', 'ĐH Bách Khoa', 'Công nghệ thông tin', 1, 1, '0912345678', 'ACTIVE');
 
 -- Seed data cho intern_documents
 INSERT IGNORE INTO intern_documents (

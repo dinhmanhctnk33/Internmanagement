@@ -318,7 +318,7 @@ public class UserDAO {
         String sql = """
                 SELECT 1
                 FROM users
-                WHERE email = ?
+                WHERE LOWER(email) = LOWER(?)
                 LIMIT 1
                 """;
 
@@ -444,6 +444,70 @@ public class UserDAO {
         }
 
         return false;
+    }
+
+    public int insertWithRole(User user, String roleCode) throws SQLException {
+        String userSql = """
+                INSERT INTO users
+                (username, password, email, full_name, status, last_login_at,
+                 create_at, update_at, c_password, act_token, ex_date_at, phone_number)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
+
+        try (Connection connection = DBConnection.getConnection()) {
+            connection.setAutoCommit(false);
+            try {
+                int userId;
+                try (PreparedStatement statement = connection.prepareStatement(
+                        userSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    statement.setString(1, user.getUsername());
+                    statement.setString(2, user.getPassword());
+                    statement.setString(3, user.getEmail());
+                    statement.setString(4, user.getFull_name());
+                    statement.setString(5, user.getStatus());
+                    setLocalDateTime(statement, 6, user.getLast_login_at());
+                    setLocalDate(statement, 7, user.getCreate_at());
+                    setLocalDate(statement, 8, user.getUpdate_at());
+                    statement.setBoolean(9, user.isC_password());
+                    statement.setString(10, user.getAct_token());
+                    setLocalDate(statement, 11, user.getEx_date_at());
+                    statement.setString(12, user.getPhone_number());
+                    statement.executeUpdate();
+                    try (ResultSet keys = statement.getGeneratedKeys()) {
+                        if (!keys.next()) {
+                            throw new SQLException("Không nhận được ID tài khoản mới.");
+                        }
+                        userId = keys.getInt(1);
+                    }
+                }
+
+                int roleId;
+                try (PreparedStatement statement =
+                             connection.prepareStatement("SELECT id FROM roles WHERE role_code = ?")) {
+                    statement.setString(1, roleCode);
+                    try (ResultSet results = statement.executeQuery()) {
+                        if (!results.next()) {
+                            throw new SQLException("Không tìm thấy vai trò " + roleCode + ".");
+                        }
+                        roleId = results.getInt("id");
+                    }
+                }
+
+                try (PreparedStatement statement =
+                             connection.prepareStatement("INSERT INTO user_roles(user_id, role_id) VALUES (?, ?)")) {
+                    statement.setInt(1, userId);
+                    statement.setInt(2, roleId);
+                    statement.executeUpdate();
+                }
+
+                connection.commit();
+                user.setId(userId);
+                return userId;
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            }
+        }
     }
 
 
@@ -1093,4 +1157,3 @@ public class UserDAO {
         return "INTERN";
     }
 }
-

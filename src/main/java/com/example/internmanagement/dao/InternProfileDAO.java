@@ -52,6 +52,19 @@ public class InternProfileDAO {
         }
     }
 
+    public List<InternProfile> findActiveByMentorUserId(int mentorUserId) throws SQLException {
+        String sql = PROFILE_SELECT
+                + " WHERE ip.mentor_id = (SELECT id FROM mentors WHERE user_id = ?)"
+                + " AND ip.internship_status = 'ACTIVE' ORDER BY u.full_name";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, mentorUserId);
+            try (ResultSet results = statement.executeQuery()) {
+                return mapProfiles(results);
+            }
+        }
+    }
+
     public List<InternProfile> searchInterns(String keyword) throws SQLException {
         return searchInterns(keyword, null, null);
     }
@@ -99,15 +112,15 @@ public class InternProfileDAO {
     }
 
     private List<String> findDistinctProfileValues(String columnName) throws SQLException {
-        String sql = "SELECT DISTINCT TRIM(" + columnName + ") AS value "
+        String sql = "SELECT DISTINCT TRIM(" + columnName + ") AS distinct_value "
                 + "FROM intern_profiles WHERE " + columnName + " IS NOT NULL "
-                + "AND TRIM(" + columnName + ") <> '' ORDER BY value";
+            + "AND TRIM(" + columnName + ") <> '' ORDER BY distinct_value";
         List<String> values = new ArrayList<>();
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet results = statement.executeQuery()) {
             while (results.next()) {
-                values.add(results.getString("value"));
+                values.add(results.getString("distinct_value"));
             }
         }
         return values;

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 public class Candidate {
  
     private int id;
+    private int userId;
     private String fullName;
     private String email;
     private String phone;
@@ -51,6 +52,22 @@ public class Candidate {
     public void setId(int id) {
         this.id = id;
     }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
  
     public String getFullname() {
         return fullName;
@@ -58,6 +75,14 @@ public class Candidate {
  
     public void setFullname(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getUniversityName() {
+        return universityName;
+    }
+
+    public void setUniversityName(String universityName) {
+        this.universityName = universityName;
     }
  
     public String getEmail() {
@@ -83,6 +108,14 @@ public class Candidate {
     public void setUniversityname(String universityName) {
         this.universityName = universityName;
     }
+
+    public String getMajorName() {
+        return majorName;
+    }
+
+    public void setMajorName(String majorName) {
+        this.majorName = majorName;
+    }
  
     public String getMajorname() {
         return majorName;
@@ -90,6 +123,14 @@ public class Candidate {
  
     public void setMajorname(String majorName) {
         this.majorName = majorName;
+    }
+
+    public String getDesiredPosition() {
+        return desiredPosition;
+    }
+
+    public void setDesiredPosition(String desiredPosition) {
+        this.desiredPosition = desiredPosition;
     }
  
     public String getDesiredposition() {
@@ -99,6 +140,14 @@ public class Candidate {
     public void setDesiredposition(String desiredPosition) {
         this.desiredPosition = desiredPosition;
     }
+
+    public String getCvFileUrl() {
+        return cvFileUrl;
+    }
+
+    public void setCvFileUrl(String cvFileUrl) {
+        this.cvFileUrl = cvFileUrl;
+    }
  
     public String getCvfileurl() {
         return cvFileUrl;
@@ -106,6 +155,14 @@ public class Candidate {
  
     public void setCvfileurl(String cvFileUrl) {
         this.cvFileUrl = cvFileUrl;
+    }
+
+    public String getApplicationStatus() {
+        return applicationStatus;
+    }
+
+    public void setApplicationStatus(String applicationStatus) {
+        this.applicationStatus = applicationStatus;
     }
  
     public String getApplicationstatus() {
@@ -115,6 +172,14 @@ public class Candidate {
     public void setApplicationstatus(String applicationStatus) {
         this.applicationStatus = applicationStatus;
     }
+
+    public String getHrNotes() {
+        return hrNotes;
+    }
+
+    public void setHrNotes(String hrNotes) {
+        this.hrNotes = hrNotes;
+    }
  
     public String getHrnotes() {
         return hrNotes;
@@ -122,6 +187,14 @@ public class Candidate {
  
     public void setHrnotes(String hrNotes) {
         this.hrNotes = hrNotes;
+    }
+
+    public LocalDateTime getAppliedAt() {
+        return appliedAt;
+    }
+
+    public void setAppliedAt(LocalDateTime appliedAt) {
+        this.appliedAt = appliedAt;
     }
  
     public LocalDateTime getAppliedat() {

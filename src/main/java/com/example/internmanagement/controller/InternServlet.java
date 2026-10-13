@@ -98,7 +98,10 @@ public class InternServlet extends HttpServlet {
     private void renderHome(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException, SQLException {
         com.example.internmanagement.model.User user = (com.example.internmanagement.model.User) request.getSession().getAttribute("user");
-        String role = (user != null && user.getRole() != null) ? user.getRole() : "INTERN";
+        String role = (String) request.getSession().getAttribute("userRole");
+        if (role == null) {
+            role = (user != null && user.getRole() != null) ? user.getRole() : "INTERN";
+        }
 
         if ("ADMIN".equalsIgnoreCase(role)) {
             // Load danh sách user với role_code để dashboard-admin.jsp hiển thị
@@ -127,6 +130,8 @@ public class InternServlet extends HttpServlet {
             }
             request.setAttribute("users", rows);
             request.getRequestDispatcher("/WEB-INF/views/dashboard-admin.jsp").forward(request, response);
+        } else if ("CANDIDATE".equalsIgnoreCase(role)) {
+            response.sendRedirect(request.getContextPath() + "/applications");
         } else if ("INTERN".equalsIgnoreCase(role)) {
             if (user != null) {
                 InternProfile profile = profileDAO.findByUserId(user.getId());
@@ -146,6 +151,8 @@ public class InternServlet extends HttpServlet {
                 }
             }
             request.getRequestDispatcher("/WEB-INF/views/dashboard-intern.jsp").forward(request, response);
+        } else if ("MENTOR".equalsIgnoreCase(role)) {
+            response.sendRedirect(request.getContextPath() + "/mentor/tasks/assign");
         } else {
             String keyword = request.getParameter("q");
             String university = request.getParameter("university");

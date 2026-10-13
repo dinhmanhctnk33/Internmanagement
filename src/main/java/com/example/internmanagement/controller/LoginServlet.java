@@ -78,7 +78,10 @@ public class LoginServlet extends HttpServlet {
             session.setMaxInactiveInterval(30 * 60);
 
             // Chuyển đến trang chủ
-            response.sendRedirect(request.getContextPath() + "/home");
+            String destination = "CANDIDATE".equalsIgnoreCase(roleCode)
+                    ? "/applications"
+                    : "/home";
+            response.sendRedirect(request.getContextPath() + destination);
 
         } else {
 

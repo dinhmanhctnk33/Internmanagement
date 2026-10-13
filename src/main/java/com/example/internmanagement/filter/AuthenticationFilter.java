@@ -1,9 +1,16 @@
 package com.example.internmanagement.filter;
 
-import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.*;
 import java.io.IOException;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebFilter("/*")
 public class AuthenticationFilter implements Filter {
@@ -16,7 +23,7 @@ public class AuthenticationFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
         String path = req.getRequestURI().substring(req.getContextPath().length());
 
-        if (path.equals("/login") || path.equals("/forgot-pass") || path.equals("/forgot-password") || path.equals("/reset-password") || path.startsWith("/assets/") || path.startsWith("/frontend/")) {
+        if (path.equals("/login") || path.equals("/register") || path.equals("/forgot-pass") || path.equals("/forgot-password") || path.equals("/reset-password") || path.startsWith("/assets/") || path.startsWith("/frontend/")) {
             chain.doFilter(request, response);
             return;
         }

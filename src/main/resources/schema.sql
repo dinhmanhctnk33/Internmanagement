@@ -78,6 +78,7 @@ CREATE TABLE user_roles (
 -- 5. candidates ---------------------------------------------------------
 CREATE TABLE candidates (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id             BIGINT       NULL,
     full_name           VARCHAR(100) NOT NULL,
     email               VARCHAR(100) NOT NULL,
     phone               VARCHAR(20)  NULL,
@@ -88,6 +89,9 @@ CREATE TABLE candidates (
     application_status  VARCHAR(30)  NOT NULL DEFAULT 'NEW',
     hr_notes            TEXT         NULL,
     applied_at          DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_candidates_user_id UNIQUE (user_id),
+    CONSTRAINT fk_candidates_user FOREIGN KEY (user_id) REFERENCES users(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT chk_candidates_status CHECK (application_status IN ('NEW','INTERVIEWING','ACCEPTED','REJECTED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Hồ sơ ứng viên đăng ký thực tập trực tuyến';
 
