@@ -1,8 +1,16 @@
 package com.example.internmanagement.controller;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import com.example.internmanagement.dao.InternDocumentDAO;
 import com.example.internmanagement.dao.InternProfileDAO;
+import com.example.internmanagement.dao.NotificationDAO;
 import com.example.internmanagement.model.InternProfile;
+import com.example.internmanagement.model.Notification;
+import com.example.internmanagement.model.User;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,17 +18,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.regex.Pattern;
-
 @WebServlet({"/home", "/interns", "/interns/new", "/interns/edit", "/interns/profile"})
 public class InternServlet extends HttpServlet {
 
     private static final Pattern VIETNAM_PHONE_PATTERN = Pattern.compile("^0[0-9]{9}$");
     private final InternProfileDAO profileDAO = new InternProfileDAO();
     private final InternDocumentDAO documentDAO = new InternDocumentDAO();
+    private final NotificationDAO notificationDAO = new NotificationDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -97,11 +101,16 @@ public class InternServlet extends HttpServlet {
 
     private void renderHome(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException, SQLException {
-        com.example.internmanagement.model.User user = (com.example.internmanagement.model.User) request.getSession().getAttribute("user");
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            user = (User) request.getSession().getAttribute("currentUser");
+        }
         String role = (String) request.getSession().getAttribute("userRole");
         if (role == null) {
             role = (user != null && user.getRole() != null) ? user.getRole() : "INTERN";
         }
+
+        loadNotificationSummary(request, user);
 
         if ("ADMIN".equalsIgnoreCase(role)) {
             // Load danh sách user với role_code để dashboard-admin.jsp hiển thị
@@ -163,6 +172,20 @@ public class InternServlet extends HttpServlet {
             request.setAttribute("pendingDocuments", loadPendingDocuments());
             request.setAttribute("dashboardStats", loadHrDashboardStats());
             request.getRequestDispatcher("/WEB-INF/views/dashboard.jsp").forward(request, response);
+        }
+    }
+
+    private void loadNotificationSummary(HttpServletRequest request, User user) throws SQLException {
+        if (user == null || user.getId() <= 0) {
+            return;
+        }
+
+        try (java.sql.Connection connection = com.example.internmanagement.util.DBConnection.getConnection()) {
+            java.util.List<Notification> notifications = notificationDAO.findByUserId(connection, user.getId(), 20);
+            notifications.forEach(item -> item.setTargetUrl("/notifications?open=" + item.getId()));
+            request.setAttribute("notifications", notifications);
+            request.setAttribute("recentNotifications", notifications.size() > 5 ? notifications.subList(0, 5) : notifications);
+            request.setAttribute("unreadNotificationCount", notificationDAO.countUnreadForUser(connection, user.getId()));
         }
     }
 

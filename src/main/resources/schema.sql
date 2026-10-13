@@ -267,6 +267,30 @@ CREATE TABLE weekly_reports (
     CONSTRAINT chk_weekly_reports_status CHECK (status IN ('SUBMITTED','REJECTED','APPROVED'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Báo cáo tiến độ tuần của Thực tập sinh';
 
+-- 14a. meetings -----------------------------------------------------------------
+CREATE TABLE meetings (
+    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title               VARCHAR(200) NOT NULL,
+    description         TEXT NULL,
+    starts_at           DATETIME NOT NULL,
+    status              VARCHAR(20) NOT NULL DEFAULT 'SCHEDULED',
+    created_by_user_id  BIGINT NOT NULL,
+    created_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_meetings_creator FOREIGN KEY (created_by_user_id) REFERENCES users(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT chk_meetings_status CHECK (status IN ('SCHEDULED','CANCELLED','COMPLETED'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Lịch họp mentor với thực tập sinh';
+
+CREATE TABLE meeting_attendees (
+    meeting_id          BIGINT NOT NULL,
+    intern_profile_id   BIGINT NOT NULL,
+    PRIMARY KEY (meeting_id, intern_profile_id),
+    CONSTRAINT fk_meeting_attendees_meeting FOREIGN KEY (meeting_id) REFERENCES meetings(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_meeting_attendees_profile FOREIGN KEY (intern_profile_id) REFERENCES intern_profiles(id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Thực tập sinh tham gia từng cuộc họp';
+
 -- 15. evaluation_criteria ---------------------------------------------------------
 CREATE TABLE evaluation_criteria (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -387,11 +411,16 @@ CREATE TABLE support_tickets (
 CREATE TABLE notifications (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id     BIGINT       NOT NULL,
+    notification_type VARCHAR(50) NULL,
     title       VARCHAR(200) NOT NULL,
     message     TEXT         NULL,
     target_url  VARCHAR(255) NULL,
+    target_entity_type VARCHAR(50) NULL,
+    target_entity_id BIGINT NULL,
+    reminder_key VARCHAR(150) NULL,
     is_read     BOOLEAN      NOT NULL DEFAULT FALSE,
     created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_notifications_reminder UNIQUE (user_id, reminder_key),
     CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES users(id)
         ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Thông báo hệ thống gửi tới người dùng';

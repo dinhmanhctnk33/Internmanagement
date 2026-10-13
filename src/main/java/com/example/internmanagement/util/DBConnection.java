@@ -90,6 +90,8 @@ public class DBConnection {
 
     static synchronized void ensureDatabaseInitialized(Connection connection) throws SQLException {
         if (tableExists(connection, "users")) {
+            ensureNotificationSchema(connection);
+            ensureMeetingSchema(connection);
             return;
         }
 
@@ -100,6 +102,67 @@ public class DBConnection {
 
         executeScript(connection, "schema.sql");
         executeScript(connection, "demo-data.sql");
+    }
+
+    private static void ensureNotificationSchema(Connection connection) throws SQLException {
+        if (!tableExists(connection, "notifications")) {
+            return;
+        }
+        addColumnIfMissing(connection, "notification_type", "VARCHAR(50) NULL");
+        addColumnIfMissing(connection, "target_entity_type", "VARCHAR(50) NULL");
+        addColumnIfMissing(connection, "target_entity_id", "BIGINT NULL");
+        addColumnIfMissing(connection, "reminder_key", "VARCHAR(150) NULL");
+
+        boolean reminderIndexExists = false;
+        try (ResultSet indexes = connection.getMetaData().getIndexInfo(
+                connection.getCatalog(), connection.getSchema(), "NOTIFICATIONS", true, false)) {
+            while (indexes.next()) {
+                if ("uq_notifications_reminder".equalsIgnoreCase(indexes.getString("INDEX_NAME"))) {
+                    reminderIndexExists = true;
+                    break;
+                }
+            }
+        }
+        if (!reminderIndexExists) {
+            try (Statement statement = connection.createStatement()) {
+                statement.execute("CREATE UNIQUE INDEX uq_notifications_reminder "
+                        + "ON notifications (user_id, reminder_key)");
+            }
+        }
+    }
+
+    private static void ensureMeetingSchema(Connection connection) throws SQLException {
+        if (!tableExists(connection, "intern_profiles")) {
+            return;
+        }
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("CREATE TABLE IF NOT EXISTS meetings ("
+                    + "id BIGINT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(200) NOT NULL, description TEXT NULL, "
+                    + "starts_at DATETIME NOT NULL, status VARCHAR(20) NOT NULL DEFAULT 'SCHEDULED', "
+                    + "created_by_user_id BIGINT NOT NULL, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, "
+                    + "CONSTRAINT fk_meetings_creator FOREIGN KEY (created_by_user_id) REFERENCES users(id), "
+                    + "CONSTRAINT chk_meetings_status CHECK (status IN ('SCHEDULED','CANCELLED','COMPLETED')))");
+            statement.execute("CREATE TABLE IF NOT EXISTS meeting_attendees ("
+                    + "meeting_id BIGINT NOT NULL, intern_profile_id BIGINT NOT NULL, "
+                    + "PRIMARY KEY (meeting_id, intern_profile_id), "
+                    + "CONSTRAINT fk_meeting_attendees_meeting FOREIGN KEY (meeting_id) REFERENCES meetings(id) "
+                    + "ON DELETE CASCADE, "
+                    + "CONSTRAINT fk_meeting_attendees_profile FOREIGN KEY (intern_profile_id) "
+                    + "REFERENCES intern_profiles(id) ON DELETE CASCADE)");
+        }
+    }
+
+    private static void addColumnIfMissing(Connection connection, String columnName, String definition)
+            throws SQLException {
+        try (ResultSet columns = connection.getMetaData().getColumns(
+                connection.getCatalog(), connection.getSchema(), "NOTIFICATIONS", columnName.toUpperCase())) {
+            if (columns.next()) {
+                return;
+            }
+        }
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("ALTER TABLE notifications ADD COLUMN " + columnName + " " + definition);
+        }
     }
 
     private static synchronized void initializeEmbeddedDatabase(Connection connection) throws SQLException {
@@ -119,8 +182,10 @@ public class DBConnection {
                 "CREATE TABLE mentors (id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, mentor_code VARCHAR(30) NOT NULL, department_id BIGINT NULL, job_title VARCHAR(100) NULL, max_capacity INT NOT NULL DEFAULT 5, status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE')",
                 "CREATE TABLE intern_profiles (id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, intern_code VARCHAR(30) NOT NULL, identity_number VARCHAR(20) NULL, date_of_birth DATE NULL, gender VARCHAR(10) NULL, address VARCHAR(255) NULL, university_name VARCHAR(150) NULL, major_name VARCHAR(100) NULL, program_id BIGINT NULL, mentor_id BIGINT NULL, start_date DATE NULL, end_date DATE NULL, bank_account_no VARCHAR(30) NULL, bank_name VARCHAR(100) NULL, phone_number VARCHAR(20) NULL, internship_status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE')",
                 "CREATE TABLE tasks (id BIGINT AUTO_INCREMENT PRIMARY KEY, task_title VARCHAR(200) NOT NULL, description TEXT NULL, mentor_id BIGINT NULL, intern_profile_id BIGINT NULL, due_date DATETIME NULL, priority VARCHAR(20) NOT NULL DEFAULT 'MEDIUM', completion_percent INT NOT NULL DEFAULT 0, status VARCHAR(30) NOT NULL DEFAULT 'TODO', deliverable_url VARCHAR(500) NULL)",
+                "CREATE TABLE meetings (id BIGINT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(200) NOT NULL, description TEXT NULL, starts_at DATETIME NOT NULL, status VARCHAR(20) NOT NULL DEFAULT 'SCHEDULED', created_by_user_id BIGINT NOT NULL, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT chk_meetings_status CHECK (status IN ('SCHEDULED','CANCELLED','COMPLETED')))",
+                "CREATE TABLE meeting_attendees (meeting_id BIGINT NOT NULL, intern_profile_id BIGINT NOT NULL, PRIMARY KEY (meeting_id, intern_profile_id))",
                 "CREATE TABLE intern_documents (id BIGINT AUTO_INCREMENT PRIMARY KEY, intern_profile_id BIGINT NOT NULL, document_type VARCHAR(50) NOT NULL, file_name VARCHAR(255) NULL, file_url VARCHAR(500) NULL, file_size_bytes BIGINT NULL, approval_status VARCHAR(30) NOT NULL DEFAULT 'PENDING', rejection_note TEXT NULL, uploaded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)",
-                "CREATE TABLE notifications (id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, title VARCHAR(200) NOT NULL, message TEXT, target_url VARCHAR(255), is_read BOOLEAN NOT NULL DEFAULT FALSE, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)",
+                "CREATE TABLE notifications (id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, notification_type VARCHAR(50), title VARCHAR(200) NOT NULL, message TEXT, target_url VARCHAR(255), target_entity_type VARCHAR(50), target_entity_id BIGINT, reminder_key VARCHAR(150), is_read BOOLEAN NOT NULL DEFAULT FALSE, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_notifications_reminder UNIQUE (user_id, reminder_key))",
                 "INSERT INTO roles (id, role_code, role_name, description) VALUES (1, 'ADMIN', 'Quản trị viên', 'Quản trị hệ thống'), (2, 'HR', 'Phòng nhân sự', 'Quản lý nhân sự và TTS'), (3, 'MENTOR', 'Cán bộ Hướng dẫn', 'Hướng dẫn thực tập sinh'), (4, 'INTERN', 'Thực tập sinh', 'Sinh viên thực tập'), (5, 'CANDIDATE', 'Ứng viên', 'Ứng viên đăng ký chương trình thực tập')",
                 "INSERT INTO permissions (id, permission_code, permission_name, module_group) VALUES (1, 'INTERN_CREATE', 'Tạo hồ sơ thực tập sinh', 'INTERN'), (2, 'INTERN_EDIT', 'Chỉnh sửa hồ sơ thực tập sinh', 'INTERN'), (3, 'DOCUMENT_REVIEW', 'Duyệt tài liệu thực tập sinh', 'DOCUMENT'), (4, 'DOCUMENT_UPLOAD', 'Tải tài liệu thực tập sinh', 'DOCUMENT')",
                 "INSERT INTO role_permissions (role_id, permission_id) SELECT r.id, p.id FROM roles r CROSS JOIN permissions p WHERE r.role_code = 'ADMIN' OR (r.role_code = 'HR' AND p.permission_code IN ('INTERN_CREATE', 'INTERN_EDIT', 'DOCUMENT_REVIEW')) OR (r.role_code = 'INTERN' AND p.permission_code = 'DOCUMENT_UPLOAD')",
