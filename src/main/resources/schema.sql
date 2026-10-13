@@ -476,3 +476,14 @@ CREATE INDEX idx_leave_requests_profile    ON leave_requests(intern_profile_id);
 CREATE INDEX idx_notifications_user        ON notifications(user_id);
 CREATE INDEX idx_audit_logs_user           ON audit_logs(user_id);
 CREATE INDEX idx_audit_logs_table_record   ON audit_logs(table_name, record_id);
+-- Bổ sung bảng vào Cơ sở dữ liệu
+CREATE TABLE IF NOT EXISTS work_schedules (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    group_id INT NOT NULL,
+    shift_name VARCHAR(100) NOT NULL,
+    start_time VARCHAR(10) NOT NULL,
+    end_time VARCHAR(10) NOT NULL,
+    work_days VARCHAR(255) NOT NULL,
+    note TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
