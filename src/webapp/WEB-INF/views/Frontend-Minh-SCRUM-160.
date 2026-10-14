@@ -1,0 +1,76 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Khối lượng mentor - IMS</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261007-3">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-block-end:18px}
+.stat{padding:16px 18px}.stat strong{display:block;font-size:26px}.stat small{color:var(--text-muted)}
+.load-bar{block-size:8px;border-radius:999px;background:#e9edf2;overflow:hidden;min-inline-size:120px}
+.load-bar span{display:block;block-size:100%;background:var(--action-accent)}
+.load-bar.over span{background:#b42318}
+.badge.over{background:#fde8e8;color:#b42318}
+@media(max-width:900px){.stat-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body><div class="layout">
+<aside class="sidebar">
+  <div class="logo"><div class="logo-icon"><i class="fa-solid fa-user-tie"></i></div>
+    <div><h2>IMS Portal</h2><span>Phòng Nhân sự (HR)</span></div></div>
+  <nav class="menu"><p class="menu-title">NGHIỆP VỤ HR</p>
+    <a href="${pageContext.request.contextPath}/home" class="menu-item"><i class="fa-solid fa-chart-line"></i><span>Dashboard HR</span></a>
+    <a href="${pageContext.request.contextPath}/applications" class="menu-item"><i class="fa-solid fa-circle-check"></i><span>Kết quả ứng viên</span></a>
+    <a href="${pageContext.request.contextPath}/mentor-workload" class="menu-item active"><i class="fa-solid fa-people-group"></i><span>Khối lượng mentor</span></a>
+    <a href="${pageContext.request.contextPath}/review-emails" class="menu-item"><i class="fa-solid fa-envelope-circle-check"></i><span>Email kết quả</span></a>
+  </nav>
+  <div class="sidebar-bottom"><a href="${pageContext.request.contextPath}/logout" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất</span></a></div>
+</aside>
+
+<main class="main"><header class="header"></header>
+<section class="content">
+  <div class="page-title"><div>
+    <h1><i class="fa-solid fa-people-group" style="color:var(--action-accent);margin-inline-end:10px"></i>Khối lượng công việc của mentor</h1>
+    <p>Số thực tập sinh đang hoạt động của từng mentor, giúp HR phân bổ lại cho cân bằng.</p>
+  </div></div>
+
+  <c:if test="${not empty error}"><div class="result-alert error"><c:out value="${error}"/></div></c:if>
+
+  <div class="stat-row">
+    <div class="card stat"><strong>${totalMentors}</strong><small>Mentor</small></div>
+    <div class="card stat"><strong>${totalInterns}</strong><small>Thực tập sinh đang hoạt động</small></div>
+    <div class="card stat"><strong>${avgInterns}</strong><small>Trung bình mỗi mentor</small></div>
+    <div class="card stat"><strong>${overloaded}</strong><small>Mentor quá tải (trên ${maxCapacity})</small></div>
+  </div>
+
+  <form class="review-tools" method="get">
+    <label class="search">Tìm mentor
+      <input name="q" value="<c:out value='${keyword}'/>" placeholder="Tên hoặc email"/></label>
+    <button class="primary-btn" type="submit">Lọc</button>
+  </form>
+
+  <div class="card"><div class="table-container"><table>
+    <thead><tr><th>Mentor</th><th>Số thực tập sinh</th><th>Mức tải</th><th>Trạng thái</th></tr></thead>
+    <tbody>
+      <c:forEach items="${mentors}" var="m">
+        <c:set var="over" value="${m.internCount > maxCapacity}"/>
+        <c:set var="pct" value="${m.internCount * 100 / maxCapacity}"/>
+        <c:set var="barW" value="${over ? 100 : pct}"/>
+        <tr>
+          <td class="candidate-meta"><strong><c:out value="${m.fullName}"/></strong>
+            <small><c:out value="${m.email}"/></small></td>
+          <td><strong>${m.internCount}</strong></td>
+          <td><progress class="load-bar ${over ? 'over' : ''}" value="${over ? maxCapacity : m.internCount}" max="${maxCapacity}"></progress></td>
+          <td><span class="badge ${over ? 'over' : (m.internCount == 0 ? 'pending' : 'active')}">
+            ${over ? 'Quá tải' : (m.internCount == 0 ? 'Chưa có thực tập sinh' : 'Phù hợp')}</span></td>
+        </tr>
+      </c:forEach>
+      <c:if test="${empty mentors}">
+        <tr><td colspan="4" style="padding:42px;text-align:center;color:var(--text-muted)">Không có mentor phù hợp.</td></tr>
+      </c:if>
+    </tbody></table></div></div>
+</section></main></div></body></html>
