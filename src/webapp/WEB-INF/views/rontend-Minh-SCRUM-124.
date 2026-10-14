@@ -1,0 +1,107 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Cập nhật tiến độ - IMS</title>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261007-3">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-block-end:18px}
+.stat{padding:16px 18px}.stat strong{display:block;font-size:26px}.stat small{color:var(--text-muted)}
+.task-card{padding:18px 20px;margin-block-end:14px}
+.task-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-block-end:10px}
+.task-head h3{margin:0;font-size:16px}
+.task-head small{display:block;color:var(--text-muted);margin-block-start:4px}
+.task-form{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.task-form label{display:block;font-size:13px;font-weight:600;margin-block-end:6px}
+.task-form select,.task-form textarea{inline-size:100%;padding:9px 10px;border:1px solid #d6dbe1;border-radius:8px;font:inherit;box-sizing:border-box}
+.task-form textarea{min-block-size:74px;resize:vertical}
+.range-row{display:flex;align-items:center;gap:12px}
+.range-row input[type=range]{flex:1}
+.range-row output{min-inline-size:44px;font-weight:800;text-align:end}
+.task-actions{grid-column:1 / -1;display:flex;justify-content:flex-end}
+.bar{appearance:none;-webkit-appearance:none;border:0;border-radius:999px;background:#e9edf2;inline-size:100%;block-size:8px;overflow:hidden;margin-block-end:12px}
+.bar::-webkit-progress-bar{background:#e9edf2;border-radius:999px}
+.bar::-webkit-progress-value{background:var(--action-accent);border-radius:999px}
+.bar::-moz-progress-bar{background:var(--action-accent);border-radius:999px}
+.badge.blocked{background:#fde8e8;color:#b42318}
+@media(max-width:900px){.stat-row{grid-template-columns:1fr}.task-form{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="layout">
+<aside class="sidebar">
+  <div class="logo"><div class="logo-icon"><i class="fa-solid fa-user-graduate"></i></div>
+    <div><h2>IMS Portal</h2><span>Thực tập sinh</span></div></div>
+  <nav class="menu"><p class="menu-title">THỰC TẬP SINH</p>
+    <a href="${pageContext.request.contextPath}/home" class="menu-item"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
+    <a href="${pageContext.request.contextPath}/intern/progress" class="menu-item active"><i class="fa-solid fa-list-check"></i><span>Cập nhật tiến độ</span></a>
+    <a href="${pageContext.request.contextPath}/attendance" class="menu-item"><i class="fa-solid fa-clock"></i><span>Chấm công</span></a>
+    <a href="${pageContext.request.contextPath}/contract" class="menu-item"><i class="fa-solid fa-file-signature"></i><span>Hợp đồng</span></a>
+  </nav>
+  <div class="sidebar-bottom"><a href="${pageContext.request.contextPath}/logout" class="menu-item logout"><i class="fa-solid fa-right-from-bracket"></i><span>Đăng xuất</span></a></div>
+</aside>
+
+<main class="main"><header class="header"></header>
+<section class="content">
+  <div class="page-title"><div>
+    <h1><i class="fa-solid fa-list-check" style="color:var(--action-accent);margin-inline-end:10px"></i>Cập nhật tiến độ công việc</h1>
+    <p>Cập nhật phần trăm hoàn thành và ghi chú để mentor theo dõi tiến độ của bạn.</p>
+  </div></div>
+
+  <c:if test="${param.result == 'saved'}"><div class="result-alert">Đã lưu tiến độ. Mentor sẽ thấy cập nhật này.</div></c:if>
+  <c:if test="${param.error == 'invalid'}"><div class="result-alert error">Dữ liệu không hợp lệ: tiến độ từ 0 đến 100, ghi chú tối đa 500 ký tự.</div></c:if>
+  <c:if test="${param.error == 'notfound'}"><div class="result-alert error">Không tìm thấy công việc hoặc bạn không có quyền cập nhật.</div></c:if>
+  <c:if test="${param.error == 'db' || not empty error}"><div class="result-alert error">Có lỗi hệ thống, vui lòng thử lại.</div></c:if>
+
+  <div class="stat-row">
+    <div class="card stat"><strong>${totalTasks}</strong><small>Công việc được giao</small></div>
+    <div class="card stat"><strong>${doneTasks}</strong><small>Đã hoàn thành</small></div>
+    <div class="card stat"><strong>${avgProgress}%</strong><small>Tiến độ trung bình</small></div>
+  </div>
+
+  <c:forEach items="${tasks}" var="t">
+    <div class="card task-card">
+      <div class="task-head">
+        <div>
+          <h3><c:out value="${t.title}"/></h3>
+          <small><c:out value="${t.description}"/></small>
+          <c:if test="${not empty t.dueDate}"><small><i class="fa-regular fa-calendar"></i> Hạn: ${t.dueDate}</small></c:if>
+        </div>
+        <span class="badge ${t.status == 'DONE' ? 'active' : (t.status == 'BLOCKED' ? 'blocked' : 'pending')}">
+          ${t.status == 'DONE' ? 'Hoàn thành' : (t.status == 'BLOCKED' ? 'Vướng mắc' : (t.status == 'IN_PROGRESS' ? 'Đang làm' : 'Chưa làm'))}</span>
+      </div>
+      <progress class="bar" value="${t.progress}" max="100"></progress>
+
+      <form class="task-form" method="post" action="${pageContext.request.contextPath}/intern/progress">
+        <input type="hidden" name="taskId" value="${t.id}"/>
+        <div>
+          <label for="p${t.id}">Tiến độ hoàn thành</label>
+          <div class="range-row">
+            <input id="p${t.id}" type="range" name="progress" min="0" max="100" step="5" value="${t.progress}"
+                   oninput="this.nextElementSibling.value=this.value+'%'"/>
+            <output>${t.progress}%</output>
+          </div>
+          <label for="s${t.id}" style="margin-block-start:14px">Trạng thái</label>
+          <select id="s${t.id}" name="status">
+            <option value="TODO" ${t.status == 'TODO' ? 'selected' : ''}>Chưa làm</option>
+            <option value="IN_PROGRESS" ${t.status == 'IN_PROGRESS' ? 'selected' : ''}>Đang làm</option>
+            <option value="BLOCKED" ${t.status == 'BLOCKED' ? 'selected' : ''}>Vướng mắc</option>
+            <option value="DONE" ${t.status == 'DONE' ? 'selected' : ''}>Hoàn thành</option>
+          </select>
+        </div>
+        <div>
+          <label for="n${t.id}">Ghi chú cho mentor</label>
+          <textarea id="n${t.id}" name="note" maxlength="500" placeholder="Đã làm được gì, khó khăn, cần hỗ trợ..."><c:out value="${t.internNote}"/></textarea>
+        </div>
+        <div class="task-actions"><button class="primary-btn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Lưu tiến độ</button></div>
+      </form>
+    </div>
+  </c:forEach>
+
+  <c:if test="${empty tasks}">
+    <div class="card" style="padding:42px;text-align:center;color:var(--text-muted)">Bạn chưa được giao công việc nào.</div>
+  </c:if>
+</section></main></div></body></html>
