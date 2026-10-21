@@ -14,6 +14,10 @@ public class AuthenticationFilter implements Filter {
         
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+        res.setHeader("X-Content-Type-Options", "nosniff");
+        res.setHeader("X-Frame-Options", "DENY");
+        res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+        res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
         String path = req.getRequestURI().substring(req.getContextPath().length());
 
         if (path.equals("/login") || path.equals("/register") || path.equals("/forgot-pass") || path.equals("/forgot-password") || path.equals("/reset-password") || path.startsWith("/assets/") || path.startsWith("/frontend/")) {

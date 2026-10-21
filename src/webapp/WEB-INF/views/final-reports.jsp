@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -8,7 +9,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/dashboard.css?v=20261012-3">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/attendance-report.css?v=20261010-1">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/intern-header.css?v=20261010-2">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/final-report.css?v=20261013-5">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/frontend/css/final-report.css?v=20261021-1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
@@ -88,6 +89,56 @@
                                 </table></div>
                                 <p class="fr-hint">Tên trường viết khác nhau (viết tắt, sai chính tả) được coi là các trường khác nhau. Nếu thấy hai dòng cùng một trường, hãy sửa lại hồ sơ trước khi gửi.</p>
                             </c:if>
+
+                            <div class="fr-content-preview">
+                                <div class="fr-content-heading">
+                                    <div><span>NỘI DUNG SẼ ĐƯỢC XUẤT</span><h4>${pv.reportType == 'LEADER' ? 'Số liệu báo cáo lãnh đạo' : 'Chi tiết báo cáo gửi trường'}</h4></div>
+                                    <span class="fr-preview-note"><i class="fa-solid fa-eye"></i> Bản xem trước trực tiếp</span>
+                                </div>
+
+                                <c:if test="${pv.reportType == 'LEADER'}">
+                                    <c:set var="ranges" value="${['1,0–1,9', '2,0–2,9', '3,0–3,9', '4,0–5,0']}"/>
+                                    <c:forEach items="${pv.content.programs}" var="p">
+                                        <section class="fr-content-section">
+                                            <div class="fr-content-title"><div><h5><c:out value="${p.programName}"/></h5><p><fmt:formatNumber value="${p.finalizedCount}" pattern="0"/>/<fmt:formatNumber value="${p.internCount}" pattern="0"/> thực tập sinh có đánh giá đã chốt</p></div><span><fmt:formatNumber value="${p.internCount}" pattern="0"/> TTS</span></div>
+                                            <div class="fr-score-grid">
+                                                <div><span>TB kỹ năng</span><strong>${empty p.avgTechnical ? '—' : p.avgTechnical}</strong></div>
+                                                <div><span>TB thái độ</span><strong>${empty p.avgAttitude ? '—' : p.avgAttitude}</strong></div>
+                                                <div><span>TB chung</span><strong>${empty p.avgFinal ? '—' : p.avgFinal}</strong></div>
+                                                <div><span>Chuyên cần</span><strong>${empty p.avgAttendanceRate ? '—' : p.avgAttendanceRate}${empty p.avgAttendanceRate ? '' : '%'}</strong></div>
+                                                <div><span>Báo cáo tuần</span><strong><fmt:formatNumber value="${p.weeklySubmitted}" pattern="0"/></strong></div>
+                                            </div>
+                                            <c:choose>
+                                                <c:when test="${empty p.distribution}"><p class="fr-no-data"><i class="fa-regular fa-circle-info"></i> Chưa có đánh giá đã chốt để tính điểm và phân bố.</p></c:when>
+                                                <c:otherwise><div class="fr-distribution"><c:forEach items="${ranges}" var="range" varStatus="st"><div><span>${range}</span><b><fmt:formatNumber value="${p.distribution[st.index]}" pattern="0"/></b></div></c:forEach></div></c:otherwise>
+                                            </c:choose>
+                                            <c:if test="${not empty p.departments}">
+                                                <div class="report-table-wrap fr-content-table"><table><thead><tr><th>PHÒNG BAN</th><th>SỐ TTS</th><th>ĐÃ CHỐT</th><th>TB KỸ NĂNG</th><th>TB THÁI ĐỘ</th><th>TB CHUNG</th></tr></thead><tbody>
+                                                <c:forEach items="${p.departments}" var="d"><tr><td><strong><c:out value="${d.departmentName}"/></strong></td><td><fmt:formatNumber value="${d.internCount}" pattern="0"/></td><td><fmt:formatNumber value="${d.finalizedCount}" pattern="0"/></td><td>${empty d.avgTechnical ? '—' : d.avgTechnical}</td><td>${empty d.avgAttitude ? '—' : d.avgAttitude}</td><td>${empty d.avgFinal ? '—' : d.avgFinal}</td></tr></c:forEach>
+                                                </tbody></table></div>
+                                            </c:if>
+                                        </section>
+                                    </c:forEach>
+                                </c:if>
+
+                                <c:if test="${pv.reportType == 'SCHOOL'}">
+                                    <c:forEach items="${pv.content}" var="school">
+                                        <section class="fr-content-section">
+                                            <div class="fr-content-title"><div><h5><c:out value="${school.schoolName}"/></h5><p>${school.interns.size()} thực tập sinh trong tệp báo cáo này</p></div><span>${school.interns.size()} TTS</span></div>
+                                            <div class="report-table-wrap fr-content-table"><table><thead><tr><th>HỌ TÊN</th><th>CHƯƠNG TRÌNH / PHÒNG BAN</th><th>KỲ THỰC TẬP</th><th>ĐI LÀM</th><th>KỸ NĂNG</th><th>THÁI ĐỘ</th><th>ĐIỂM CHUNG</th><th>NHẬN XÉT</th></tr></thead><tbody>
+                                            <c:forEach items="${school.interns}" var="intern"><tr>
+                                                <td><strong><c:out value="${intern.fullName}"/></strong></td>
+                                                <td><c:out value="${intern.programName}"/><small><c:out value="${intern.departmentName}"/></small></td>
+                                                <td>${empty intern.startDate ? '—' : intern.startDate}<br>${empty intern.endDate ? '—' : intern.endDate}</td>
+                                                <td><fmt:formatNumber value="${intern.attendedDays}" pattern="0"/>/<c:choose><c:when test="${empty intern.expectedDays}">—</c:when><c:otherwise><fmt:formatNumber value="${intern.expectedDays}" pattern="0"/></c:otherwise></c:choose></td>
+                                                <c:choose><c:when test="${intern.hasEvaluation}"><td>${intern.technicalScore}</td><td>${intern.attitudeScore}</td><td><strong>${intern.finalScore}</strong></td><td><c:out value="${intern.comments}" default="—"/></td></c:when><c:otherwise><td colspan="4" class="fr-muted-cell">Chưa có đánh giá đã chốt</td></c:otherwise></c:choose>
+                                            </tr></c:forEach>
+                                            </tbody></table></div>
+                                        </section>
+                                    </c:forEach>
+                                    <c:if test="${empty pv.content}"><p class="fr-no-data">Chưa có thực tập sinh để xem trước nội dung.</p></c:if>
+                                </c:if>
+                            </div>
                         </div>
                     </c:forEach>
 

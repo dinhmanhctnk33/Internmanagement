@@ -66,6 +66,20 @@ Sau khi build, deploy `target/Internmanagement.war` lên Tomcat 10.1+, sau đó 
 http://localhost:8080/Internmanagement/login
 ```
 
+## Kiểm thử toàn hệ thống
+
+Sau khi deploy ứng dụng local, chạy bộ kiểm thử chức năng, phi chức năng, kiến trúc
+và hộp xám:
+
+```powershell
+.\tools\test-system.ps1
+```
+
+Nếu chưa chạy Tomcat, có thể kiểm tra mã nguồn, nghiệp vụ và khả năng đóng gói bằng
+`.\tools\test-system.ps1 -SkipHttp`. Ma trận chi tiết nằm tại
+`docs/KE-HOACH-KIEM-THU.md` và kết quả lần chạy gần nhất nằm tại
+`docs/BAO-CAO-KIEM-THU.md`.
+
 ## Cấu hình email kết quả xét duyệt
 
 Khai báo các biến môi trường trước khi khởi động Tomcat:

@@ -1067,7 +1067,7 @@ public class UserDAO {
                 """;
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, newPassword);
+            statement.setString(1, PasswordUtil.hash(newPassword));
             statement.setString(2, token);
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {

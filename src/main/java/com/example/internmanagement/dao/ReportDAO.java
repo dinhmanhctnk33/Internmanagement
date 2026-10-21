@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalDouble;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -127,6 +128,14 @@ public class ReportDAO {
             result.put("notFinalized", notFinalized);
             result.put("emptyPrograms", emptyPrograms);
             result.put("schools", schools);
+            // Dùng đúng bộ dựng payload của bản chụp để nội dung xem trước và file xuất không lệch nhau.
+            if (ReportSnapshot.TYPE_LEADER.equals(reportType)) {
+                Object content = GSON.fromJson(GSON.toJson(buildLeader(interns, names)), Map.class);
+                result.put("content", normalizePreviewCounts(content, null));
+            } else {
+                Object content = GSON.fromJson(GSON.toJson(buildSchools(interns)), List.class);
+                result.put("content", normalizePreviewCounts(content, null));
+            }
             return result;
         }
     }
@@ -524,6 +533,29 @@ public class ReportDAO {
     private static double round(double value, int digits) {
         double f = Math.pow(10, digits);
         return Math.round(value * f) / f;
+    }
+
+    /** Gson Map dùng Double cho mọi số; đổi riêng các đại lượng đếm về Long để JSP không hiện "2.0 TTS". */
+    private static Object normalizePreviewCounts(Object value, String field) {
+        if (value instanceof Map<?, ?> source) {
+            Map<String, Object> normalized = new LinkedHashMap<>();
+            for (Map.Entry<?, ?> entry : source.entrySet()) {
+                String key = String.valueOf(entry.getKey());
+                normalized.put(key, normalizePreviewCounts(entry.getValue(), key));
+            }
+            return normalized;
+        }
+        if (value instanceof List<?> source) {
+            List<Object> normalized = new ArrayList<>();
+            for (Object item : source) normalized.add(normalizePreviewCounts(item, field));
+            return normalized;
+        }
+        if (value instanceof Number number && Set.of(
+                "internCount", "finalizedCount", "notFinalizedCount", "weeklySubmitted",
+                "weeklyLate", "attendedDays", "expectedDays", "distribution").contains(field)) {
+            return number.longValue();
+        }
+        return value;
     }
 
     private static int weekdays(LocalDate from, LocalDate to) {

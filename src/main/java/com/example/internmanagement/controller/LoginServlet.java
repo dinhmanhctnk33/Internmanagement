@@ -69,8 +69,12 @@ public class LoginServlet extends HttpServlet {
             String roleCode = userDAO.getUserRoleCode(user.getId());
             user.setRole(roleCode);
 
-            // Tạo session
-            HttpSession session = request.getSession();
+            // Hủy session cũ để ngăn session fixation, sau đó cấp session mới.
+            HttpSession existingSession = request.getSession(false);
+            if (existingSession != null) {
+                existingSession.invalidate();
+            }
+            HttpSession session = request.getSession(true);
 
             // Lưu user vào session
             session.setAttribute("user", user);
