@@ -1,6 +1,7 @@
 # Build outputs
 target/
 .maven-repo/
+.m2/
 .worktrees/
 out/
 *.class
@@ -31,6 +32,7 @@ src/main/resources/db-config.json
 
 # Local analysis documents and document-generation utilities
 Nghiệp vụ/
+Sprint 3/
 *.docx
 tools/
 build_*backlog.mjs

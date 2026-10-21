@@ -26,10 +26,9 @@ Khi chạy local, có thể sao chép `src/main/resources/db-config.example.json
 ## Khởi tạo dữ liệu
 
 1. Tạo/kết nối MySQL bằng tài khoản đã cấu hình.
-2. Chạy lần lượt:
-   - `src/main/resources/schema.sql`
-   - `src/main/resources/migration-001-rbac.sql`
-   - `src/main/resources/demo-data.sql`
+2. Chạy một file duy nhất: `src/main/resources/database.sql`.
+
+File này đã bao gồm toàn bộ cấu trúc bảng, phần mở rộng nghiệp vụ và dữ liệu mẫu cần thiết cho môi trường local.
 
 ## Build và chạy
 
@@ -65,3 +64,10 @@ kết quả tuyển dụng.
 
 Không commit `target/`, `tmp/`, `node_modules/`, file cookie hoặc file cấu hình
 chứa mật khẩu.
+
+## Lịch họp và email tự động
+
+HR và mentor truy cập `/meetings` để tạo, cập nhật hoặc hủy lịch họp. Mentor chỉ
+chọn được thực tập sinh đang được mình hướng dẫn. Email mời/hủy được gửi ngay;
+các cập nhật quan trọng trong vòng 5 phút được gộp trước khi gửi. Trạng thái gửi
+theo từng người nhận được hiển thị trong chi tiết lịch họp.

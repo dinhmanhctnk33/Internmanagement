@@ -214,6 +214,23 @@ table {
     margin-right: 0;
 }
 
+/* Shared role-aware navigation. Every screen keeps the same group names and order. */
+.unified-menu-title{padding-top:8px;margin-bottom:4px}
+.nav-section{margin:4px 0;border-radius:9px}
+.nav-section>summary{display:flex;align-items:center;gap:8px;min-height:43px;padding:9px 10px;border-radius:8px;color:#dbe7f5;cursor:pointer;list-style:none;font-size:12px;font-weight:650;transition:background .16s,color .16s}
+.nav-section>summary::-webkit-details-marker{display:none}
+.nav-section>summary::marker{content:''}
+.nav-section>summary:hover,.nav-section[open]>summary{background:rgba(77,126,181,.36);color:#fff}
+.nav-section>summary>i:first-child{flex:0 0 22px;font-size:14px;text-align:center}
+.nav-section>summary>span{min-width:0;flex:1;line-height:1.3}
+.nav-chevron{margin-left:auto;font-size:9px;transition:transform .18s}
+.nav-section[open] .nav-chevron{transform:rotate(180deg)}
+.nav-section-items{display:grid;gap:2px;padding:4px 0 4px 12px}
+.nav-section:not([open]) .nav-section-items{display:none}
+.nav-section-items .menu-item{min-height:38px;margin:0;padding:8px 10px;font-size:12px;border-radius:7px}
+.nav-section-items .menu-item i{flex:0 0 22px;margin-right:7px;font-size:12px}
+.nav-section-items .menu-item.active{background:#356ba5;color:#fff;box-shadow:none}
+
 .menu-item {
     text-decoration: none;
     color: #E2E8F0;
@@ -332,6 +349,146 @@ table {
     gap: 20px;
     flex: 0 0 auto;
     min-width: 0;
+}
+
+/* Shared header account controls. Keep button rendering identical across
+   pages, including pages that do not load the optional intern header CSS. */
+.account-menu,
+.notification-wrap {
+    position: relative;
+}
+
+.account-trigger.user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    margin: 0;
+    padding: 6px 10px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: #FFFFFF;
+    font: inherit;
+    text-align: left;
+    appearance: none;
+    cursor: pointer;
+}
+
+.account-trigger.user:hover,
+.account-trigger.user[aria-expanded="true"] {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.account-trigger .user-info {
+    min-width: 0;
+}
+
+.account-trigger .user-info strong,
+.account-trigger .user-info small {
+    overflow: hidden;
+    max-width: 190px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.account-chevron {
+    margin-left: 2px;
+    color: #FFFFFF;
+    font-size: 11px;
+}
+
+.account-dropdown,
+.notification-menu {
+    position: absolute;
+    z-index: 160;
+    top: calc(100% + 10px);
+    right: 0;
+    border: 1px solid #DCE5F0;
+    border-radius: 10px;
+    background: #FFFFFF;
+    box-shadow: 0 14px 30px rgba(17, 45, 78, 0.20);
+}
+
+.account-dropdown[hidden],
+.notification-menu[hidden] {
+    display: none;
+}
+
+.account-dropdown {
+    min-width: 210px;
+    padding: 7px;
+}
+
+.account-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 11px;
+    border-radius: 7px;
+    color: #234A7D;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.account-dropdown a:hover {
+    background: #EDF3FB;
+}
+
+.account-dropdown .logout-link {
+    color: #BD3F3F;
+}
+
+.notification-menu {
+    width: min(350px, calc(100vw - 32px));
+    max-height: 430px;
+    overflow: auto;
+}
+
+.notification-menu h3 {
+    margin: 0;
+    padding: 14px 15px;
+    border-bottom: 1px solid #E6EDF5;
+    color: #163A69;
+    font-size: 14px;
+}
+
+.notification-empty {
+    padding: 24px 15px;
+    color: #718096;
+    text-align: center;
+    font-size: 12px;
+}
+
+.notification-item {
+    display: block;
+    padding: 11px 15px;
+    border-bottom: 1px solid #EDF2F7;
+    color: #315F96;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.notification-item:hover,
+.notification-item.unread {
+    background: #F1F6FC;
+}
+
+.notification-item strong,
+.notification-item span {
+    display: block;
+}
+
+.notification-item span {
+    margin-top: 3px;
+    color: #718096;
+}
+
+.notification-all {
+    text-align: center;
+    font-weight: 700;
 }
 
 /* Header toolbars must shrink inside the main column instead of pushing the
@@ -976,9 +1133,14 @@ tr:hover {
     }
     .logo > div:last-child,
     .menu-title,
-    .menu-item span {
+    .menu-item span,
+    .nav-section summary span,
+    .nav-section summary .nav-chevron {
         display: none;
     }
+    .nav-section>summary{justify-content:center;padding:10px}
+    .nav-section>summary>i:first-child{flex:0 0 auto}
+    .nav-section-items{padding-left:0}
     .logo-icon {
         margin: 0;
     }

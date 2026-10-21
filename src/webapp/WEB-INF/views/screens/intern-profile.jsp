@@ -228,6 +228,6 @@
         </section>
     </main>
 </div>
-<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261010-2"></script>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261013-2"></script>
 </body>
 </html>

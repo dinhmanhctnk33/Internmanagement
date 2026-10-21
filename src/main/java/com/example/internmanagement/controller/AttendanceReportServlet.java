@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet("/attendance-report")
+@WebServlet({"/attendance-report", "/leave-approvals"})
 public class AttendanceReportServlet extends HttpServlet {
 
     @Override
@@ -52,6 +52,7 @@ public class AttendanceReportServlet extends HttpServlet {
 
         Long programId = parseId(request.getParameter("programId"));
         String keyword = clean(request.getParameter("q"));
+        boolean leaveMode = "/leave-approvals".equals(request.getServletPath());
 
         try (Connection connection = DBConnection.getConnection()) {
             List<Map<String, Object>> report = loadSummary(connection, fromDate, toDate, programId, keyword);
@@ -61,6 +62,9 @@ public class AttendanceReportServlet extends HttpServlet {
             request.setAttribute("report", report);
             request.setAttribute("attendanceRecords", attendance);
             request.setAttribute("leaveRequests", leaves);
+            request.setAttribute("leaveMode", leaveMode);
+            request.setAttribute("pendingLeaveCount", leaves.stream()
+                    .filter(row -> "PENDING".equals(row.get("approval_status"))).count());
             request.setAttribute("programs", loadPrograms(connection));
             request.setAttribute("metrics", calculateMetrics(report));
             request.setAttribute("fromDate", fromDate);
@@ -138,7 +142,8 @@ public class AttendanceReportServlet extends HttpServlet {
         String sql = "SELECT lr.id,u.full_name,ip.intern_code,p.program_name,lr.leave_type,lr.start_date,lr.end_date," +
                 "lr.total_days,lr.reason,lr.approval_status,lr.approver_notes FROM leave_requests lr " +
                 "JOIN intern_profiles ip ON ip.id=lr.intern_profile_id JOIN users u ON u.id=ip.user_id " +
-                "LEFT JOIN internship_programs p ON p.id=ip.program_id WHERE lr.end_date>=? AND lr.start_date<=? " +
+                "LEFT JOIN internship_programs p ON p.id=ip.program_id " +
+                "WHERE (lr.approval_status='PENDING' OR (lr.end_date>=? AND lr.start_date<=?)) " +
                 "AND (? IS NULL OR ip.program_id=?) AND (?='' OR u.full_name LIKE CONCAT('%',?,'%') " +
                 "OR ip.intern_code LIKE CONCAT('%',?,'%')) ORDER BY lr.start_date DESC,lr.id DESC LIMIT 200";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {

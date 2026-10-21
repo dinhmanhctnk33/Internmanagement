@@ -18,7 +18,7 @@
             <p class="menu-title">QUẢN TRỊ</p>
             <a href="${pageContext.request.contextPath}/admin/users" class="menu-item"><i class="fa-solid fa-user-plus"></i><span>Tạo tài khoản</span></a>
             <a href="${pageContext.request.contextPath}/admin/accounts" class="menu-item active"><i class="fa-solid fa-user-gear"></i><span>Quản lý tài khoản hệ thống</span></a>
-            <a href="${pageContext.request.contextPath}/admin/permissions" class="menu-item"><i class="fa-solid fa-user-lock"></i><span>Phân quyền chi tiết (RBAC)</span></a>
+            <a href="${pageContext.request.contextPath}/admin/permissions" class="menu-item"><i class="fa-solid fa-user-lock"></i><span>Phân quyền chi tiết</span></a>
             <p class="menu-title">HỆ THỐNG</p>
             <a href="${pageContext.request.contextPath}/home" class="menu-item"><i class="fa-solid fa-chart-line"></i><span>Bảng điều khiển chung</span></a>
         </nav>
@@ -52,6 +52,6 @@
     </section>
 </div>
 <script src="${pageContext.request.contextPath}/frontend/js/admin-password-reset.js?v=20261007-1"></script>
-<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261010-2"></script>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261013-2"></script>
 </body>
 </html>

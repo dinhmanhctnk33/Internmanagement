@@ -163,8 +163,8 @@ public class MentorAssignmentServlet extends HttpServlet {
     }
 
     private Map<String, Object> lockMentor(Connection connection, long mentorId) throws SQLException {
-        String sql = "SELECT m.id,m.department_id mentor_department_id,m.max_capacity,m.status,u.id mentor_user_id,u.full_name "
-                + "FROM mentors m JOIN users u ON u.id=m.user_id WHERE m.id=? FOR UPDATE";
+        String sql = "SELECT m.id,m.department_id mentor_department_id,m.max_capacity,m.status,u.id mentor_user_id,COALESCE(u.full_name,m.full_name) full_name "
+                + "FROM mentors m LEFT JOIN users u ON u.id=m.user_id WHERE m.id=? FOR UPDATE";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, mentorId);
             try (ResultSet result = statement.executeQuery()) {
@@ -233,7 +233,7 @@ public class MentorAssignmentServlet extends HttpServlet {
     private List<Map<String, Object>> loadInterns(Connection connection, Long programId,
                                                    String assignment, String keyword) throws SQLException {
         String sql = "SELECT ip.id,ip.intern_code,ip.program_id,ip.mentor_id,u.full_name,u.email," 
-                + "p.program_name,p.department_id,d.dept_name,mu.full_name mentor_name,m.mentor_code "
+                + "p.program_name,p.department_id,d.dept_name,COALESCE(mu.full_name,m.full_name) mentor_name,m.mentor_code "
                 + "FROM intern_profiles ip JOIN users u ON u.id=ip.user_id "
                 + "LEFT JOIN internship_programs p ON p.id=ip.program_id LEFT JOIN departments d ON d.id=p.department_id "
                 + "LEFT JOIN mentors m ON m.id=ip.mentor_id LEFT JOIN users mu ON mu.id=m.user_id "
@@ -255,12 +255,12 @@ public class MentorAssignmentServlet extends HttpServlet {
     }
 
     private List<Map<String, Object>> loadMentors(Connection connection) throws SQLException {
-        String sql = "SELECT m.id,m.mentor_code,m.department_id,m.max_capacity,m.status,u.full_name,u.email,d.dept_name," 
+        String sql = "SELECT m.id,m.mentor_code,m.department_id,m.max_capacity,m.status,COALESCE(u.full_name,m.full_name) full_name,COALESCE(u.email,m.email) email,d.dept_name,"
                 + "COUNT(CASE WHEN ip.internship_status='ACTIVE' THEN 1 END) load_count "
-                + "FROM mentors m JOIN users u ON u.id=m.user_id LEFT JOIN departments d ON d.id=m.department_id "
+                + "FROM mentors m LEFT JOIN users u ON u.id=m.user_id LEFT JOIN departments d ON d.id=m.department_id "
                 + "LEFT JOIN intern_profiles ip ON ip.mentor_id=m.id WHERE m.status='ACTIVE' "
-                + "GROUP BY m.id,m.mentor_code,m.department_id,m.max_capacity,m.status,u.full_name,u.email,d.dept_name "
-                + "ORDER BY d.dept_name,u.full_name";
+                + "GROUP BY m.id,m.mentor_code,m.department_id,m.max_capacity,m.status,u.full_name,m.full_name,u.email,m.email,d.dept_name "
+                + "ORDER BY d.dept_name,full_name";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             return rows(statement);
         }

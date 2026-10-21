@@ -15,6 +15,7 @@ public class NotificationDAO {
     }
     public int unreadCount(int userId)throws SQLException{try(Connection c=com.example.internmanagement.util.DBConnection.getConnection();PreparedStatement s=c.prepareStatement("SELECT COUNT(*) FROM notifications WHERE user_id=? AND is_read=0")){s.setInt(1,userId);try(ResultSet r=s.executeQuery()){r.next();return r.getInt(1);}}}
     public void markAllRead(int userId)throws SQLException{try(Connection c=com.example.internmanagement.util.DBConnection.getConnection();PreparedStatement s=c.prepareStatement("UPDATE notifications SET is_read=1 WHERE user_id=?")){s.setInt(1,userId);s.executeUpdate();}}
+    public void markRead(int userId,long notificationId)throws SQLException{try(Connection c=com.example.internmanagement.util.DBConnection.getConnection();PreparedStatement s=c.prepareStatement("UPDATE notifications SET is_read=1 WHERE id=? AND user_id=?")){s.setLong(1,notificationId);s.setInt(2,userId);s.executeUpdate();}}
 
     public int notifyRole(Connection connection, String roleCode, String title,
                           String message, String targetUrl) throws SQLException {

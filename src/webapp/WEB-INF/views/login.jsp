@@ -47,7 +47,7 @@
             
             <div class="mb-5">
                 <h2 class="text-2xl font-bold text-brand-dark">Đăng nhập hệ thống</h2>
-                <p class="text-gray-500 text-sm mt-1">Vui lòng chọn vai trò và nhập thông tin tài khoản</p>
+                <p class="text-gray-500 text-sm mt-1">Vui lòng nhập thông tin tài khoản để tiếp tục</p>
             </div>
 
             <%-- Hiển thị thông báo phản hồi từ Controller/Servlet --%>
@@ -77,25 +77,6 @@
             <!-- Form xử lý gửi dữ liệu sang Servlet/Controller -->
             <form action="${pageContext.request.contextPath}/login" method="post" class="space-y-4">
                 
-                <!-- Field: Select Role -->
-                <div>
-                    <label for="role" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                        Dành cho
-                    </label>
-                    <div class="relative">
-                        <select id="role" name="role" required
-                            class="w-full pl-3 pr-8 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-800 input-focus transition duration-150 appearance-none cursor-pointer">
-                            <option value="INTERN" ${param.role == 'INTERN' ? 'selected' : ''}>Thực tập sinh (Sinh viên)</option>
-                            <option value="MENTOR" ${param.role == 'MENTOR' ? 'selected' : ''}>Cán bộ Hướng dẫn (Mentor / Doanh nghiệp)</option>
-                            <option value="ADMIN" ${param.role == 'ADMIN' ? 'selected' : ''}>Quản trị viên</option>
-                            <option value="HR" ${param.role == 'HR' ? 'selected' : ''}>Phòng nhân sự</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Field: Mã thực tập sinh / Email -->
                 <div>
                     <label for="username" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">

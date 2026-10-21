@@ -56,9 +56,18 @@ public class MentorReportDAO {
     }
 
     public List<Map<String, Object>> recentNotifications(long userId) throws SQLException {
-        String sql = "SELECT id,title,message,target_url targetUrl,is_read=1 `read`,created_at FROM notifications WHERE user_id=? ORDER BY created_at DESC,id DESC LIMIT 5";
+        String sql = "SELECT id,title,message,target_url targetUrl,is_read `read`,created_at FROM notifications WHERE user_id=? ORDER BY created_at DESC,id DESC LIMIT 5";
         try (Connection connection = DBConnection.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, userId); return rows(statement);
+            statement.setLong(1, userId);
+            List<Map<String, Object>> notifications = rows(statement);
+            for (Map<String, Object> notification : notifications) {
+                Object value = notification.get("read");
+                boolean read = value instanceof Boolean booleanValue
+                        ? booleanValue
+                        : value instanceof Number number && number.intValue() != 0;
+                notification.put("read", read);
+            }
+            return notifications;
         }
     }
 

@@ -1,0 +1,20 @@
+html{scroll-behavior:smooth}
+.add-mentor-shortcut{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 17px;border-radius:9px;background:#356ba5;color:#fff;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 4px 11px rgba(53,107,165,.2)}
+.add-mentor-shortcut:hover{background:#285a8d}
+.mentor-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:18px}
+.mentor-metrics article{display:flex;align-items:center;gap:12px;min-height:94px;padding:15px 16px;border:1px solid #dbe5f0;border-radius:12px;background:#fff;box-shadow:0 3px 12px rgba(27,54,93,.045)}
+.mentor-metrics article.needs-attention{border-color:#efd8ad;background:#fffdf8}
+.mentor-metrics .metric-icon{display:grid;place-items:center;flex:0 0 42px;height:42px;border-radius:10px;font-size:16px}
+.metric-icon.total{color:#31689f;background:#eaf3fc}.metric-icon.active,.metric-icon.linked{color:#287b53;background:#e9f7ef}.metric-icon.unlinked{color:#a46d19;background:#fff2dc}
+.mentor-metrics small,.mentor-metrics strong,.mentor-metrics p{display:block;margin:0}.mentor-metrics small{color:#7a8b9f;font-size:10px;font-weight:800;letter-spacing:.04em}.mentor-metrics strong{margin:2px 0;color:#173f70;font-size:23px;line-height:1.05}.mentor-metrics p{color:#8392a4;font-size:11px}
+.required-note{margin-left:auto;color:#7e8ea1;font-size:11px}.required-note b{color:#c73f47}
+.create-action{display:flex;flex-direction:column;align-items:stretch;gap:5px}.create-action small{color:#8191a4;font-size:10px;text-align:center}.mentor-create-form>.create-action button{width:100%}
+.mentor-table-wrap tbody tr{transition:background .16s}.mentor-table-wrap tbody tr:hover{background:#f8fbfe}.mentor-table-wrap th{position:sticky;top:0;z-index:1}.mentor-table-wrap td:first-child{min-width:280px}.mentor-table-wrap td:nth-child(2){min-width:170px}
+/* The filter belongs to the list, so visually attach it to the list card instead of
+   presenting a third, competing card between create and results. */
+.mentor-filter{margin-bottom:0;border-bottom:0;border-radius:13px 13px 0 0;background:#f8fafc;box-shadow:none}
+.mentor-filter+.list-card{border-radius:0 0 13px 13px}
+.mentor-filter+.list-card .list-title{background:#fff}
+@media(max-width:1250px){.mentor-metrics{grid-template-columns:repeat(2,1fr)}.mentor-create-form{grid-template-columns:1fr 1fr}.create-action{grid-column:2}}
+@media(max-width:760px){.mentor-metrics{grid-template-columns:1fr 1fr}.mentor-heading .add-mentor-shortcut{width:100%}.required-note{display:none}.create-action{grid-column:auto}}
+@media(max-width:520px){.mentor-metrics{grid-template-columns:1fr}}

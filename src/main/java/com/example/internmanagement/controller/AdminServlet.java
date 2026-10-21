@@ -39,7 +39,7 @@ public class AdminServlet extends HttpServlet {
                     : "/WEB-INF/views/dashboard-admin.jsp";
             request.getRequestDispatcher(view).forward(request, response);
         } catch (SQLException e) {
-            throw new ServletException("Không thể tải cấu hình quản trị. Hãy chạy migration-001-rbac.sql nếu đây là database cũ.", e);
+            throw new ServletException("Không thể tải cấu hình quản trị. Hãy cập nhật cơ sở dữ liệu bằng database.sql.", e);
         }
     }
 
@@ -108,7 +108,7 @@ public class AdminServlet extends HttpServlet {
         } catch (IllegalArgumentException e) {
             response.sendRedirect(request.getContextPath() + "/admin/permissions?error=" + urlEncode(e.getMessage()));
         } catch (SQLException e) {
-            throw new ServletException("Không thể lưu phân quyền. Hãy chạy migration-001-rbac.sql nếu bảng role_permissions chưa tồn tại.", e);
+            throw new ServletException("Không thể lưu phân quyền. Hãy cập nhật cơ sở dữ liệu bằng database.sql.", e);
         }
     }
 
@@ -167,6 +167,16 @@ public class AdminServlet extends HttpServlet {
                     statement.setInt(1, userId);
                     statement.setInt(2, roleId);
                     statement.executeUpdate();
+                }
+                if ("MENTOR".equalsIgnoreCase(roleCode)) {
+                    try (PreparedStatement statement = connection.prepareStatement(
+                            "UPDATE mentors SET user_id=?,full_name=?,email=? WHERE user_id IS NULL AND LOWER(email)=LOWER(?)")) {
+                        statement.setInt(1, userId);
+                        statement.setString(2, fullName);
+                        statement.setString(3, email.trim().toLowerCase());
+                        statement.setString(4, email.trim());
+                        statement.executeUpdate();
+                    }
                 }
                 connection.commit();
                 String notification = "not-required";
@@ -283,7 +293,9 @@ public class AdminServlet extends HttpServlet {
 
         request.setAttribute("users", users(connection));
         request.setAttribute("roles", roles);
+        request.setAttribute("roleNames", roleNames(connection));
         request.setAttribute("permissions", permissionCodes(connection));
+        request.setAttribute("permissionNames", permissionNames(connection));
         request.setAttribute("selectedRole", selectedRole);
         request.setAttribute("selectedPermissions", selectedPermissions(connection, selectedRole));
     }
@@ -331,12 +343,43 @@ public class AdminServlet extends HttpServlet {
         return result;
     }
 
+    private Map<String, String> roleNames(Connection connection) throws SQLException {
+        Map<String, String> result = new HashMap<>();
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT role_code, role_name FROM roles ORDER BY role_code");
+             ResultSet results = statement.executeQuery()) {
+            while (results.next()) result.put(results.getString(1), results.getString(2));
+        }
+        return result;
+    }
+
     private Set<String> permissionCodes(Connection connection) throws SQLException {
         Set<String> result = new HashSet<>();
         try (PreparedStatement statement = connection.prepareStatement("SELECT permission_code FROM permissions ORDER BY permission_code");
              ResultSet results = statement.executeQuery()) {
             while (results.next()) result.add(results.getString(1));
         }
+        return result;
+    }
+
+    private Map<String, String> permissionNames(Connection connection) throws SQLException {
+        Map<String, String> result = new HashMap<>();
+        try (PreparedStatement statement = connection.prepareStatement(
+                "SELECT permission_code, permission_name FROM permissions ORDER BY permission_code");
+             ResultSet results = statement.executeQuery()) {
+            while (results.next()) result.put(results.getString(1), results.getString(2));
+        }
+        result.put("ATTENDANCE_REPORT", "Xem báo cáo chấm công");
+        result.put("APPLICATION_REVIEW", "Xét duyệt hồ sơ đăng ký");
+        result.put("PROGRAM_MANAGE", "Quản lý chương trình thực tập");
+        result.put("APPLICATION_SUBMIT", "Nộp hồ sơ đăng ký thực tập");
+        result.put("CONTRACT_MANAGE", "Quản lý hợp đồng thực tập");
+        result.put("INTERN_EDIT", "Cập nhật hồ sơ thực tập sinh");
+        result.put("MENTOR_ASSIGN", "Phân công người hướng dẫn");
+        result.put("INTERN_CREATE", "Tạo hồ sơ thực tập sinh");
+        result.put("ATTENDANCE_USE", "Sử dụng chức năng chấm công");
+        result.put("DOCUMENT_UPLOAD", "Tải lên tài liệu thực tập");
+        result.put("DOCUMENT_REVIEW", "Xét duyệt tài liệu thực tập");
         return result;
     }
 

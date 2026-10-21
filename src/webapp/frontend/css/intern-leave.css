@@ -1,0 +1,126 @@
+/* SCRUM148 - Đăng ký nghỉ phép. Chỉ dùng tiền tố .lv- để không ảnh hưởng trang khác. */
+.lv-page,.lv-page *,.lv-modal *{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;box-sizing:border-box}
+.lv-page{padding-top:24px}
+.lv-page .operation-heading{margin-bottom:14px}
+.lv-page .operation-heading h1{font-size:24px}
+.lv-card{overflow:visible}
+
+.lv-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 14px;border:1px solid transparent;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.lv-btn-primary{background:#2f649a;color:#fff}
+.lv-btn-primary:hover{background:#285885}
+.lv-btn-primary:disabled{background:#94a6b9;cursor:not-allowed}
+.lv-btn-ghost{border-color:#c5d4e4;background:#fff;color:#315f96}
+.lv-btn-ghost:hover{background:#eef5fc}
+.lv-btn-link{height:auto;padding:0 4px;background:none;color:#315f96;text-decoration:underline}
+.lv-btn:focus-visible,.lv-page input:focus-visible,.lv-page select:focus-visible,.lv-modal :focus-visible,.lv-pages button:focus-visible{outline:2px solid #5b8fc7;outline-offset:1px}
+.lv-form-card[hidden],.lv-page [hidden],.lv-modal[hidden],.lv-modal [hidden]{display:none!important}
+
+/* Thanh công cụ */
+.lv-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 16px}
+.lv-search{position:relative;flex:1 1 180px;min-width:140px;max-width:280px}
+.lv-search i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#8a9db2;font-size:12px}
+.lv-toolbar .lv-search input{padding-left:30px}
+.lv-toolbar input,.lv-toolbar select,.lv-field input,.lv-field select,.lv-field textarea{width:100%;height:36px;padding:0 10px;border:1px solid #cbd9e8;border-radius:8px;background:#fff;color:#27425f;font-size:13px}
+.lv-range{display:flex;align-items:center;gap:6px;color:#8a9db2}
+.lv-range input{width:140px}
+.lv-toolbar select{width:auto;min-width:150px}
+.lv-new{margin-left:auto}
+.lv-stats{display:flex;flex-wrap:wrap;gap:4px 16px;margin:0;padding:0 16px 10px;color:#71849a;font-size:12px}
+.lv-stats b{color:#173e6d}
+.lv-error{margin:5px 0 0;color:#b4443d;font-size:12px;font-weight:600}
+.lv-filter-error{margin:0;padding:0 16px 8px}
+
+/* Bảng */
+.lv-table{border-top:1px solid #e7edf4}
+.lv-table th,.lv-table td{padding:10px 16px!important}
+.lv-table th{white-space:nowrap}
+.lv-table td{vertical-align:middle}
+.lv-reason{display:block;max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#52677f}
+.lv-note{display:block;margin-top:3px;color:#8a5a14;font-size:11px;overflow-wrap:anywhere}
+.lv-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;white-space:nowrap}
+.lv-status::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.lv-status.PENDING{color:#a86b13}
+.lv-status.APPROVED{color:#247b51}
+.lv-status.REJECTED{color:#b24a43}
+.lv-status.CANCELLED{color:#7a8a9c}
+.lv-status.EXPIRED{color:#5d6f84;font-style:italic}
+
+.lv-state{display:flex;flex-direction:column;align-items:center;gap:8px;padding:32px 16px;color:#7a8ca0;font-size:13px;text-align:center}
+.lv-state i{font-size:22px;color:#8aa4bf}
+#lvError i{color:#c0605a}
+
+.lv-pagination{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;border-top:1px solid #e7edf4;color:#71849a;font-size:12px}
+.lv-pages{display:flex;flex-wrap:wrap;gap:5px}
+.lv-pages button{min-width:30px;height:30px;padding:0 8px;border:1px solid #cbd9e8;border-radius:7px;background:#fff;color:#315f96;font-size:12px;font-weight:700;cursor:pointer}
+.lv-pages button:hover:not(:disabled){background:#eef5fc}
+.lv-pages button.active{border-color:#2f649a;background:#2f649a;color:#fff}
+.lv-pages button:disabled{opacity:.45;cursor:default}
+
+/* Form đăng ký nghỉ phép ngay trong trang */
+.lv-form-card{margin-bottom:16px;border:1px solid #d7e2ed;border-radius:13px;background:#fff;box-shadow:0 4px 14px rgba(29,61,98,.05);overflow:hidden}
+.lv-form-card .card-heading{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e7edf4}
+.lv-form-card .card-heading h2{margin:0;color:#173e6d;font-size:16px;font-weight:700}
+.lv-form{padding:16px 20px 20px}
+.lv-form-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:14px;margin-bottom:12px}
+.lv-form-error{margin:0 0 12px;padding:8px 10px;border:1px solid #efc7c4;border-radius:8px;background:#fff2f1}
+.lv-field{margin-bottom:12px;min-width:0}
+.lv-field label{display:block;margin-bottom:5px;color:#355474;font-size:12px;font-weight:700}
+.lv-field label b{color:#c0463f}
+.lv-field textarea{height:auto;min-height:64px;padding:8px 10px;resize:vertical;line-height:1.45}
+.lv-field.invalid input,.lv-field.invalid select,.lv-field.invalid textarea{border-color:#d1665f}
+.lv-form-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:14px;padding-top:10px;border-top:1px dashed #e5ecf3}
+.lv-meta{margin:0;color:#40566f;font-size:13px}
+.lv-meta strong{color:#173e6d}
+.lv-hint{color:#71849a;font-size:12px}
+.lv-warning{margin:4px 0 0;color:#8f5c10;font-size:12px;font-weight:600}
+.lv-actions{display:flex;align-items:center;gap:10px}
+.lv-actions .lv-btn-primary{min-width:130px}
+
+/* Hộp thoại xác nhận nhỏ */
+.lv-modal{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:14px}
+.lv-modal-backdrop{position:absolute;inset:0;background:rgba(15,35,60,.45)}
+.lv-confirm-box{position:relative;width:min(420px,94vw);max-height:calc(100vh - 28px);overflow:auto;padding:18px 20px 20px;border-radius:12px;background:#fff;box-shadow:0 16px 44px rgba(15,35,60,.28)}
+.lv-confirm-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.lv-confirm-head h3{margin:0;color:#173e6d;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.lv-confirm-head h3 i{color:#2f649a;font-size:16px}
+.lv-close{width:30px;height:30px;border:0;border-radius:7px;background:none;color:#71849a;cursor:pointer}
+.lv-close:hover{background:#eef3f8}
+.lv-confirm-lead{margin:0 0 12px;color:#4b637d;font-size:13px}
+.lv-summary-list{margin:0 0 16px;border:1px solid #e1eaf3;border-radius:8px;overflow:hidden;background:#fbfcfe}
+.lv-summary-list>div{display:grid;grid-template-columns:110px 1fr;gap:8px;padding:7px 12px;border-bottom:1px solid #e8eef5;font-size:12px}
+.lv-summary-list>div:last-child{border-bottom:0}
+.lv-summary-list dt{color:#71849a}
+.lv-summary-list dd{margin:0;color:#183e6d;font-weight:600;overflow-wrap:anywhere}
+.lv-confirm-actions{display:flex;justify-content:flex-end;gap:10px}
+.lv-confirm-actions .lv-btn-primary{min-width:130px}
+body.lv-lock{overflow:hidden}
+
+/* Responsive */
+@media(max-width:900px){
+    .lv-page{padding:18px 14px 40px}
+    .lv-search{max-width:none;flex-basis:100%}
+    .lv-range{flex:1 1 280px}
+    .lv-range input{width:100%}
+    .lv-toolbar select{flex:1 1 150px}
+    .lv-new{margin-left:0;flex:1 1 100%}
+    .lv-form-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:700px){
+    .lv-form-grid{grid-template-columns:1fr}
+    .lv-form-footer{flex-direction:column;align-items:stretch;gap:10px}
+    .lv-actions{justify-content:space-between}
+    .lv-actions .lv-btn{flex:1}
+    .lv-table thead{display:none}
+    .lv-table,.lv-table tbody,.lv-table tr,.lv-table td{display:block;width:100%}
+    .lv-table tr.lv-row{padding:10px 14px;border-bottom:1px solid #e8eef5}
+    .lv-table td{display:flex;justify-content:space-between;gap:12px;padding:4px 0!important;border:0!important;text-align:right!important}
+    .lv-table td::before{content:attr(data-label);flex:none;color:#71849a;font-size:11px;font-weight:700;text-align:left}
+    .lv-reason{max-width:none;white-space:normal}
+    .lv-pagination{flex-direction:column;text-align:center}
+    .lv-pages{justify-content:center}
+}
+@media(max-width:480px){
+    .lv-summary-list>div{grid-template-columns:1fr;gap:2px}
+    .lv-confirm-actions{flex-direction:column-reverse}
+    .lv-confirm-actions .lv-btn{width:100%}
+}

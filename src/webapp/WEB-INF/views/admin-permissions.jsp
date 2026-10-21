@@ -38,7 +38,7 @@
         <nav class="menu">
             <p class="menu-title">Quản trị</p>
             <a href="${pageContext.request.contextPath}/admin/users" class="menu-item"><i class="fa-solid fa-users-gear"></i><span>Tạo & Quản lý tài khoản</span></a>
-            <a href="${pageContext.request.contextPath}/admin/permissions" class="menu-item active"><i class="fa-solid fa-user-lock"></i><span>Phân quyền chi tiết (RBAC)</span></a>
+            <a href="${pageContext.request.contextPath}/admin/permissions" class="menu-item active"><i class="fa-solid fa-user-lock"></i><span>Phân quyền chi tiết</span></a>
             <p class="menu-title">Hệ thống</p>
             <a href="${pageContext.request.contextPath}/home" class="menu-item"><i class="fa-solid fa-chart-line"></i><span>Bảng điều khiển chung</span></a>
             <a href="${pageContext.request.contextPath}/departments" class="menu-item"><i class="fa-solid fa-building"></i><span>Danh mục phòng ban</span></a>
@@ -63,7 +63,7 @@
                     <form class="role-picker" action="${pageContext.request.contextPath}/admin/permissions" method="get">
                         <label for="role">Vai trò đang cấu hình</label>
                         <select id="role" name="role" onchange="this.form.submit()">
-                            <c:forEach var="roleCode" items="${roles}"><option value="${roleCode}" ${roleCode == selectedRole ? 'selected' : ''}>${roleCode}</option></c:forEach>
+                            <c:forEach var="roleCode" items="${roles}"><option value="${roleCode}" ${roleCode == selectedRole ? 'selected' : ''}><c:out value="${roleNames[roleCode]}" default="Vai trò hệ thống"/></option></c:forEach>
                         </select>
                     </form>
                     <p class="role-help"><i class="fa-solid fa-circle-info"></i> Chọn vai trò để xem và chỉnh sửa các quyền được cấp.</p>
@@ -71,13 +71,13 @@
 
                 <form class="card permission-card" action="${pageContext.request.contextPath}/admin/permissions" method="post">
                     <input type="hidden" name="role" value="${selectedRole}">
-                    <div class="card-header"><div><h3>Quyền của ${selectedRole}</h3><p>Chọn các chức năng mà vai trò này được phép thực hiện.</p></div><i class="fa-solid fa-user-shield card-header-icon"></i></div>
+                    <div class="card-header"><div><h3>Quyền của <c:out value="${roleNames[selectedRole]}" default="vai trò đã chọn"/></h3><p>Chọn các chức năng mà vai trò này được phép thực hiện.</p></div><i class="fa-solid fa-user-shield card-header-icon"></i></div>
                     <c:choose>
-                        <c:when test="${empty permissions}"><div class="empty-state">Chưa có danh mục quyền. Hãy chạy db/migrations/001-rbac.sql.</div></c:when>
+                        <c:when test="${empty permissions}"><div class="empty-state">Chưa có danh mục quyền. Vui lòng cập nhật dữ liệu phân quyền.</div></c:when>
                         <c:otherwise>
                             <div class="permission-grid">
                                 <c:forEach var="permissionCode" items="${permissions}">
-                                    <label class="permission-item"><input type="checkbox" name="permission" value="${permissionCode}" ${selectedPermissions.contains(permissionCode) ? 'checked' : ''}><span><strong>${permissionCode}</strong><c:choose><c:when test="${permissionCode == 'INTERN_CREATE'}"><span>Tạo hồ sơ thực tập sinh mới.</span></c:when><c:when test="${permissionCode == 'INTERN_EDIT'}"><span>Cập nhật thông tin và trạng thái hồ sơ.</span></c:when><c:when test="${permissionCode == 'DOCUMENT_REVIEW'}"><span>Xem, duyệt hoặc từ chối tài liệu đã nộp.</span></c:when><c:when test="${permissionCode == 'DOCUMENT_UPLOAD'}"><span>Tải lên CV và tài liệu thực tập.</span></c:when><c:otherwise><span>Cho phép sử dụng chức năng ${permissionCode}.</span></c:otherwise></c:choose></span></label>
+                                    <label class="permission-item"><input type="checkbox" name="permission" value="${permissionCode}" ${selectedPermissions.contains(permissionCode) ? 'checked' : ''}><span><strong><c:out value="${permissionNames[permissionCode]}" default="Quyền sử dụng chức năng"/></strong><c:choose><c:when test="${permissionCode == 'INTERN_CREATE'}"><span>Tạo hồ sơ thực tập sinh mới.</span></c:when><c:when test="${permissionCode == 'INTERN_EDIT'}"><span>Cập nhật thông tin và trạng thái hồ sơ.</span></c:when><c:when test="${permissionCode == 'DOCUMENT_REVIEW'}"><span>Xem, duyệt hoặc từ chối tài liệu đã nộp.</span></c:when><c:when test="${permissionCode == 'DOCUMENT_UPLOAD'}"><span>Tải lên CV và tài liệu thực tập.</span></c:when><c:otherwise><span>Cho phép sử dụng chức năng này.</span></c:otherwise></c:choose></span></label>
                                 </c:forEach>
                             </div>
                             <div class="permission-footer"><small><i class="fa-solid fa-circle-info"></i> Thay đổi chỉ có hiệu lực sau khi lưu.</small><button type="submit" class="primary-btn"><i class="fa-solid fa-floppy-disk"></i> Lưu phân quyền</button></div>
@@ -88,6 +88,6 @@
         </section>
     </main>
 </div>
-<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261010-2"></script>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261013-2"></script>
 </body>
 </html>

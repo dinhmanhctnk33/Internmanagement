@@ -58,6 +58,7 @@
             <a href="${pageContext.request.contextPath}/my-contract" class="menu-item"><i class="fa-solid fa-file-contract"></i><span>Hợp đồng của tôi</span></a>
             <a href="${pageContext.request.contextPath}/my-calendar" class="menu-item"><i class="fa-solid fa-calendar"></i><span>Lịch thực tập</span></a>
             <a href="${pageContext.request.contextPath}/attendance" class="menu-item"><i class="fa-solid fa-clock"></i><span>Check-in / Check-out</span></a>
+            <a href="${pageContext.request.contextPath}/leave-requests" class="menu-item"><i class="fa-solid fa-plane-departure"></i><span>Đăng ký nghỉ phép</span></a>
 
             <p class="menu-title">TIẾN ĐỘ THỰC TẬP</p>
 
@@ -89,12 +90,12 @@
 
             <div class="header-right">
                 <div class="notification-wrap">
-                    <button class="notification" id="notificationButton" type="button" aria-label="Thông báo" aria-expanded="false"><i class="fa-regular fa-bell"></i><c:if test="${unreadNotificationCount > 0}"><span id="notificationBadge">${unreadNotificationCount}</span></c:if></button>
+                    <button class="notification" id="notificationButton" type="button" aria-label="Thông báo" aria-expanded="false" data-menu-ready="true"><i class="fa-regular fa-bell"></i><c:if test="${unreadNotificationCount > 0}"><span id="notificationBadge">${unreadNotificationCount}</span></c:if></button>
                     <div class="notification-menu" id="notificationMenu" hidden><h3><i class="fa-solid fa-bell"></i> Thông báo</h3><c:choose><c:when test="${empty recentNotifications}"><div class="notification-empty">Chưa có thông báo mới.</div></c:when><c:otherwise><c:forEach var="item" items="${recentNotifications}"><a class="notification-item ${item.read ? '' : 'unread'}" href="${pageContext.request.contextPath}${not empty item.targetUrl ? item.targetUrl : '/home'}"><strong>${item.title}</strong><span>${item.message}</span></a></c:forEach></c:otherwise></c:choose><a class="notification-item" style="text-align:center;color:var(--action-accent);font-weight:700" href="${pageContext.request.contextPath}/notifications">Xem tất cả thông báo <i class="fa-solid fa-arrow-right"></i></a></div>
                 </div>
 
                 <div class="account-menu">
-                    <div class="account-trigger user" id="accountMenuButton" role="button" tabindex="0" aria-expanded="false" aria-controls="accountMenu">
+                    <div class="account-trigger user" id="accountMenuButton" role="button" tabindex="0" aria-expanded="false" aria-controls="accountMenu" data-menu-ready="true">
                     <div class="avatar">
                         ${currentUser.shortName != null ? currentUser.shortName : 'TTS'}
                     </div>
@@ -348,5 +349,6 @@
         document.addEventListener('click', event => { if (!event.target.closest('.notification-wrap')) close(); });
     })();
 </script>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261014-nav1"></script>
 </body>
 </html>

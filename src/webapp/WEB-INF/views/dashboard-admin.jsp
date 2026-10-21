@@ -48,7 +48,7 @@
 
             <a href="${pageContext.request.contextPath}/admin/permissions" class="menu-item">
                 <i class="fa-solid fa-user-lock"></i>
-                <span>Phân quyền chi tiết (RBAC)</span>
+                <span>Phân quyền chi tiết</span>
             </a>
 
             <p class="menu-title">HỆ THỐNG</p>
@@ -86,7 +86,7 @@
                 </a>
 
                 <div class="account-menu">
-                    <div class="account-trigger user" id="accountMenuButton" role="button" tabindex="0" aria-expanded="false" aria-controls="accountMenu">
+                    <div class="account-trigger user" id="accountMenuButton" role="button" tabindex="0" aria-expanded="false" aria-controls="accountMenu" data-menu-ready="true">
                     <div class="avatar">
                         ${currentUser.shortName != null ? currentUser.shortName : 'ADM'}
                     </div>
@@ -203,10 +203,10 @@
                                 Phân vai trò (Role) <span style="color: var(--danger-badge)">*</span>
                             </label>
                             <select name="role" required style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; background: #FFFFFF;">
-                                <option value="HR">Phòng nhân sự (HR)</option>
-                                <option value="MENTOR">Cán bộ Hướng dẫn (Mentor)</option>
-                                <option value="INTERN">Thực tập sinh (INTERN)</option>
-                                <option value="ADMIN">Quản trị viên (ADMIN)</option>
+                                <option value="HR">Phòng nhân sự</option>
+                                <option value="MENTOR">Cán bộ hướng dẫn</option>
+                                <option value="INTERN">Thực tập sinh</option>
+                                <option value="ADMIN">Quản trị viên</option>
                             </select>
                         </div>
 
@@ -217,57 +217,22 @@
                 </div>
 
 
-                <!-- PHÂN QUYỀN CHI TIẾT (RBAC) -->
+                <!-- PHÂN QUYỀN CHI TIẾT -->
                 <div class="card">
                     <div class="card-header">
                         <div>
-                            <h3>Phân quyền chi tiết (RBAC)</h3>
-                            <p>Cấu hình quyền thao tác chi tiết cho từng Vai trò trong hệ thống</p>
+                            <h3>Phân quyền chi tiết</h3>
+                            <p>Quản lý tập trung quyền thao tác của từng vai trò trong hệ thống.</p>
                         </div>
                         <i class="fa-solid fa-user-lock card-header-icon"></i>
                     </div>
-
-                    <form action="${pageContext.request.contextPath}/admin/permissions" method="post" style="display: flex; flex-direction: column; gap: 14px;">
-                        
-                        <div>
-                            <label style="display: block; font-size: 13px; font-weight: 600; color: var(--primary-dark); margin-bottom: 4px;">
-                                Chọn vai trò để phân quyền
-                            </label>
-                            <select name="role" required style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; background: #FFFFFF;">
-                                <option value="HR">Phòng nhân sự (HR)</option>
-                                <option value="INTERN">Thực tập sinh (INTERN)</option>
-                                <option value="MENTOR">Cán bộ Hướng dẫn (MENTOR)</option>
-                            </select>
+                    <div style="display:flex;flex-direction:column;gap:16px;">
+                        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
+                            <div style="padding:12px;border:1px solid var(--border-color);border-radius:9px;background:#F7FAFC;"><strong style="display:block;color:var(--primary-dark);font-size:13px;">Theo vai trò</strong><span style="color:var(--text-muted);font-size:12px;">Cấu hình riêng cho quản trị viên, nhân sự, người hướng dẫn và thực tập sinh.</span></div>
+                            <div style="padding:12px;border:1px solid var(--border-color);border-radius:9px;background:#F7FAFC;"><strong style="display:block;color:var(--primary-dark);font-size:13px;">Quản lý tập trung</strong><span style="color:var(--text-muted);font-size:12px;">Xem đầy đủ quyền hiện có và lưu thay đổi tại một màn hình.</span></div>
                         </div>
-
-                        <div style="display: flex; flex-direction: column; gap: 8px; background: #F7FAFC; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);">
-                            <strong style="font-size: 12px; color: var(--primary-dark);">Gắn quyền thao tác:</strong>
-
-                            <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="checkbox" name="permission" value="INTERN_CREATE" checked>
-                                <span>Thêm mới hồ sơ Thực tập sinh (`INTERN_CREATE`)</span>
-                            </label>
-
-                            <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="checkbox" name="permission" value="INTERN_EDIT" checked>
-                                <span>Chỉnh sửa hồ sơ Thực tập sinh (`INTERN_EDIT`)</span>
-                            </label>
-
-                            <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="checkbox" name="permission" value="DOCUMENT_REVIEW" checked>
-                                <span>Xem & Duyệt tài liệu TTS (`DOCUMENT_REVIEW`)</span>
-                            </label>
-
-                            <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="checkbox" name="permission" value="DOCUMENT_UPLOAD" checked>
-                                <span>Upload CV & Đơn xin thực tập (`DOCUMENT_UPLOAD`)</span>
-                            </label>
-                        </div>
-
-                        <button type="submit" class="outline-btn" style="margin-top: 4px;">
-                            <i class="fa-solid fa-floppy-disk"></i> LƯU CẤU HÌNH PHÂN QUYỀN
-                        </button>
-                    </form>
+                        <a href="${pageContext.request.contextPath}/admin/permissions" class="primary-btn" style="justify-content:center;text-decoration:none;"><i class="fa-solid fa-arrow-right"></i> Mở trang phân quyền</a>
+                    </div>
                 </div>
 
 
@@ -282,5 +247,6 @@
 <script>
     (() => { const button=document.getElementById('accountMenuButton'), menu=document.getElementById('accountMenu'); if(!button||!menu)return; const close=()=>{menu.hidden=true;button.setAttribute('aria-expanded','false');}; button.addEventListener('click',()=>{const open=menu.hidden;menu.hidden=!open;button.setAttribute('aria-expanded',String(open));}); document.addEventListener('click',event=>{if(!event.target.closest('.account-menu'))close();}); document.addEventListener('keydown',event=>{if(event.key==='Escape')close();}); })();
 </script>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261014-nav1"></script>
 </body>
 </html>

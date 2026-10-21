@@ -52,6 +52,19 @@ public class InternProfileDAO {
         }
     }
 
+    public List<InternProfile> findActiveByMentorUserId(int mentorUserId) throws SQLException {
+        String sql = PROFILE_SELECT
+                + " WHERE ip.mentor_id = (SELECT id FROM mentors WHERE user_id = ?)"
+                + " AND ip.internship_status = 'ACTIVE' ORDER BY u.full_name";
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, mentorUserId);
+            try (ResultSet results = statement.executeQuery()) {
+                return mapProfiles(results);
+            }
+        }
+    }
+
     public List<InternProfile> searchInterns(String keyword) throws SQLException {
         return searchInterns(keyword, null, null);
     }

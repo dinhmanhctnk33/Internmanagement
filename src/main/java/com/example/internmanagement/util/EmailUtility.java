@@ -166,4 +166,64 @@ public class EmailUtility {
         message.setContent(htmlContent, "text/html; charset=UTF-8");
         Transport.send(message);
     }
+
+    // ===================== Gửi báo cáo cuối kỳ (kèm PDF) =====================
+
+    /** Các đoạn văn của email. Thân email CHỈ có thông tin chung, mọi dữ liệu nằm trong PDF đính kèm. */
+    public static java.util.List<String> reportEmailParagraphs(String contactName, String programNames,
+            boolean schoolReport) {
+        java.util.List<String> paragraphs = new java.util.ArrayList<>();
+        paragraphs.add("Kính gửi " + (contactName == null || contactName.isBlank() ? "Quý đơn vị" : contactName) + ",");
+        if (schoolReport) {
+            paragraphs.add("Phòng Nhân sự xin gửi Quý trường báo cáo kết quả thực tập cuối kỳ của sinh viên Quý trường"
+                    + " (chương trình: " + programNames + "). Nội dung chi tiết nằm trong tệp PDF đính kèm.");
+        } else {
+            paragraphs.add("Phòng Nhân sự xin gửi báo cáo tổng hợp kết quả thực tập cuối kỳ"
+                    + " (chương trình: " + programNames + "). Nội dung chi tiết nằm trong tệp PDF đính kèm.");
+        }
+        paragraphs.add("Tệp đính kèm có thông tin nhạy cảm, vui lòng không chuyển tiếp cho người không liên quan.");
+        paragraphs.add("Đây là email tự động, vui lòng không phản hồi.");
+        return paragraphs;
+    }
+
+    public static void sendReportEmail(String recipientEmail, String subject, java.util.List<String> paragraphs,
+            byte[] pdf, String fileName) throws MessagingException, UnsupportedEncodingException {
+        if (!isConfigured()) throw new MessagingException("SMTP chưa được cấu hình.");
+        Properties props = new Properties();
+        props.put("mail.smtp.host", valueOr("IMS_SMTP_HOST", "smtp.gmail.com"));
+        props.put("mail.smtp.port", valueOr("IMS_SMTP_PORT", "587"));
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.starttls.required", "true"); // dữ liệu nhạy cảm: bắt buộc kết nối mã hóa
+        props.put("mail.smtp.connectiontimeout", "10000");
+        props.put("mail.smtp.timeout", "20000");
+        String sender = value("IMS_SMTP_USER");
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(sender, value("IMS_SMTP_PASSWORD"));
+            }
+        });
+
+        StringBuilder html = new StringBuilder("<div style='font-family:Arial,sans-serif;max-width:620px;margin:auto;"
+                + "padding:24px;color:#243b57;'><h2 style='margin:0 0 16px;color:#173d70;'>IMS Portal</h2>");
+        for (String paragraph : paragraphs) html.append("<p>").append(html(paragraph)).append("</p>");
+        html.append("</div>");
+
+        MimeBodyPart textPart = new MimeBodyPart();
+        textPart.setContent(html.toString(), "text/html; charset=UTF-8");
+        MimeBodyPart filePart = new MimeBodyPart();
+        filePart.setDataHandler(new jakarta.activation.DataHandler(
+                new jakarta.mail.util.ByteArrayDataSource(pdf, "application/pdf")));
+        filePart.setFileName(fileName);
+        MimeMultipart multipart = new MimeMultipart();
+        multipart.addBodyPart(textPart);
+        multipart.addBodyPart(filePart);
+
+        MimeMessage message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(sender, "IMS Portal - Quản lý Thực tập sinh"));
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
+        message.setSubject(subject, "UTF-8");
+        message.setContent(multipart);
+        Transport.send(message);
+    }
 }

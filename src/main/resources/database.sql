@@ -1,9 +1,15 @@
+﻿
+-- ============================================================================
+-- Nguồn hợp nhất: schema.sql
+-- ============================================================================
+
 
 CREATE DATABASE IF NOT EXISTS internship_management
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
 USE internship_management;
+
 
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -125,13 +131,16 @@ CREATE TABLE internship_programs (
 -- 11. mentors ---------------------------------------------------------------
 CREATE TABLE mentors (
     id             BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id        BIGINT      NOT NULL,
+    user_id        BIGINT      NULL,
+    full_name      VARCHAR(150) NOT NULL,
+    email          VARCHAR(254) NOT NULL,
     mentor_code    VARCHAR(30) NOT NULL,
     department_id  BIGINT      NULL,
     job_title      VARCHAR(100) NULL,
     max_capacity   INT         NOT NULL DEFAULT 5,
     status         VARCHAR(30) NOT NULL DEFAULT 'ACTIVE',
     CONSTRAINT uq_mentors_user_id UNIQUE (user_id),
+    CONSTRAINT uq_mentors_email UNIQUE (email),
     CONSTRAINT uq_mentors_code UNIQUE (mentor_code),
     CONSTRAINT fk_mentors_user FOREIGN KEY (user_id) REFERENCES users(id)
         ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -259,6 +268,8 @@ CREATE TABLE tasks (
     completion_percent   INT          NOT NULL DEFAULT 0,
     status               VARCHAR(30)  NOT NULL DEFAULT 'TODO',
     deliverable_url      VARCHAR(500) NULL,
+    intern_note          VARCHAR(500) NULL,
+    progress_updated_at  DATETIME     NULL,
     CONSTRAINT fk_tasks_mentor FOREIGN KEY (mentor_id) REFERENCES mentors(id)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT fk_tasks_profile FOREIGN KEY (intern_profile_id) REFERENCES intern_profiles(id)
@@ -282,6 +293,7 @@ CREATE TABLE weekly_reports (
     mentor_score        DECIMAL(4,2)  NULL,
     mentor_feedback     TEXT          NULL,
     status              VARCHAR(30)   NOT NULL DEFAULT 'SUBMITTED',
+    CONSTRAINT uq_weekly_reports_profile_week UNIQUE (intern_profile_id, week_number),
     CONSTRAINT fk_weekly_reports_profile FOREIGN KEY (intern_profile_id) REFERENCES intern_profiles(id)
         ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT chk_weekly_reports_status CHECK (status IN ('SUBMITTED','REJECTED','APPROVED'))
@@ -328,6 +340,23 @@ CREATE TABLE shift_configs (
     end_time               TIME         NOT NULL,
     grace_period_minutes   INT          NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Cấu hình ca làm việc và quy tắc tính trễ';
+
+-- Lịch làm việc linh hoạt theo nhóm/phòng ban -------------------------------
+CREATE TABLE work_schedules (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    group_id    BIGINT        NOT NULL,
+    shift_name  VARCHAR(100)  NOT NULL,
+    start_time  TIME          NOT NULL,
+    end_time    TIME          NOT NULL,
+    work_days   VARCHAR(100)  NOT NULL,
+    note        VARCHAR(1000) NULL,
+    created_at  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uq_work_schedules_group UNIQUE (group_id),
+    CONSTRAINT fk_work_schedules_department FOREIGN KEY (group_id) REFERENCES departments(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT chk_work_schedule_time CHECK (end_time > start_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Lịch làm việc linh hoạt theo nhóm/phòng ban';
 
 -- 18. attendance_records -------------------------------------------------------------
 CREATE TABLE attendance_records (
@@ -476,3 +505,299 @@ CREATE INDEX idx_leave_requests_profile    ON leave_requests(intern_profile_id);
 CREATE INDEX idx_notifications_user        ON notifications(user_id);
 CREATE INDEX idx_audit_logs_user           ON audit_logs(user_id);
 CREATE INDEX idx_audit_logs_table_record   ON audit_logs(table_name, record_id);
+
+
+-- ============================================================================
+-- Nguồn hợp nhất: migration-002-review-email-queue.sql
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS review_email_queue (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  document_id BIGINT NOT NULL,
+  recipient_email VARCHAR(254) NOT NULL,
+  recipient_name VARCHAR(150) NOT NULL,
+  document_name VARCHAR(255) NOT NULL,
+  decision VARCHAR(20) NOT NULL,
+  rejection_reason TEXT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+  attempt_count INT NOT NULL DEFAULT 0,
+  scheduled_at DATETIME NOT NULL,
+  next_attempt_at DATETIME NOT NULL,
+  sent_at DATETIME NULL,
+  last_error VARCHAR(1000) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT uq_review_email_document UNIQUE (document_id),
+  CONSTRAINT fk_review_email_document FOREIGN KEY (document_id) REFERENCES intern_documents(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- ============================================================================
+-- Nguồn hợp nhất: migration-004-meeting-email.sql
+-- ============================================================================
+
+
+CREATE TABLE IF NOT EXISTS meetings (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    meeting_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    meeting_mode VARCHAR(20) NOT NULL,
+    location_or_link VARCHAR(500) NOT NULL,
+    description TEXT NULL,
+    creator_user_id BIGINT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    version_no INT NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_meetings_creator FOREIGN KEY (creator_user_id) REFERENCES users(id),
+    CONSTRAINT chk_meetings_mode CHECK (meeting_mode IN ('ONLINE','OFFLINE')),
+    CONSTRAINT chk_meetings_status CHECK (status IN ('ACTIVE','CANCELLED')),
+    CONSTRAINT chk_meetings_time CHECK (end_time > start_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS meeting_recipients (
+    meeting_id BIGINT NOT NULL,
+    intern_profile_id BIGINT NOT NULL,
+    recipient_name VARCHAR(150) NOT NULL,
+    recipient_email VARCHAR(254) NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    last_email_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    last_email_type VARCHAR(20) NOT NULL DEFAULT 'INVITATION',
+    last_email_at DATETIME NULL,
+    PRIMARY KEY (meeting_id, intern_profile_id),
+    CONSTRAINT fk_meeting_recipients_meeting FOREIGN KEY (meeting_id) REFERENCES meetings(id) ON DELETE CASCADE,
+    CONSTRAINT fk_meeting_recipients_intern FOREIGN KEY (intern_profile_id) REFERENCES intern_profiles(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS meeting_email_queue (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    meeting_id BIGINT NOT NULL,
+    intern_profile_id BIGINT NOT NULL,
+    meeting_version INT NOT NULL,
+    email_type VARCHAR(20) NOT NULL,
+    recipient_email VARCHAR(254) NULL,
+    recipient_name VARCHAR(150) NOT NULL,
+    subject_line VARCHAR(255) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    attempt_count INT NOT NULL DEFAULT 0,
+    next_attempt_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    sent_at DATETIME NULL,
+    last_error VARCHAR(1000) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uq_meeting_email_event UNIQUE (meeting_id,intern_profile_id,meeting_version,email_type),
+    CONSTRAINT fk_meeting_email_meeting FOREIGN KEY (meeting_id) REFERENCES meetings(id) ON DELETE CASCADE,
+    CONSTRAINT fk_meeting_email_intern FOREIGN KEY (intern_profile_id) REFERENCES intern_profiles(id),
+    CONSTRAINT chk_meeting_email_type CHECK (email_type IN ('INVITATION','UPDATE','CANCELLATION')),
+    CONSTRAINT chk_meeting_email_status CHECK (status IN ('PENDING','PROCESSING','SENT','FAILED','FAILED_FINAL'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE INDEX idx_meetings_datetime ON meetings(meeting_date,start_time);
+CREATE INDEX idx_meeting_email_due ON meeting_email_queue(status,next_attempt_at);
+
+
+-- ============================================================================
+-- Nguồn hợp nhất: migration-005-mentor-final-evaluation.sql
+-- ============================================================================
+
+-- Run once on an existing internship_management database before deploying this version.
+
+CREATE TABLE IF NOT EXISTS mentor_final_evaluations (
+    id                       BIGINT AUTO_INCREMENT PRIMARY KEY,
+    intern_profile_id        BIGINT       NOT NULL,
+    mentor_id                BIGINT       NOT NULL,
+    status                   VARCHAR(30)  NOT NULL DEFAULT 'DRAFT',
+    knowledge_score          TINYINT      NULL,
+    problem_solving_score    TINYINT      NULL,
+    initiative_score         TINYINT      NULL,
+    teamwork_score           TINYINT      NULL,
+    skill_score              DECIMAL(3,1) NULL,
+    attitude_score           DECIMAL(3,1) NULL,
+    overall_score            DECIMAL(3,1) NULL,
+    overall_comments         VARCHAR(2000) NOT NULL DEFAULT '',
+    revision_no              INT          NOT NULL DEFAULT 1,
+    finalization_count       INT          NOT NULL DEFAULT 0,
+    finalized_at             DATETIME     NULL,
+    created_at               DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at               DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uq_mentor_final_evaluation_intern UNIQUE (intern_profile_id),
+    CONSTRAINT fk_mentor_final_evaluation_profile FOREIGN KEY (intern_profile_id) REFERENCES intern_profiles(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_mentor_final_evaluation_mentor FOREIGN KEY (mentor_id) REFERENCES mentors(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT chk_mentor_final_evaluation_status CHECK (status IN ('DRAFT','FINALIZED','FINALIZED_AGAIN')),
+    CONSTRAINT chk_mentor_final_evaluation_knowledge CHECK (knowledge_score IS NULL OR knowledge_score BETWEEN 1 AND 5),
+    CONSTRAINT chk_mentor_final_evaluation_problem CHECK (problem_solving_score IS NULL OR problem_solving_score BETWEEN 1 AND 5),
+    CONSTRAINT chk_mentor_final_evaluation_initiative CHECK (initiative_score IS NULL OR initiative_score BETWEEN 1 AND 5),
+    CONSTRAINT chk_mentor_final_evaluation_teamwork CHECK (teamwork_score IS NULL OR teamwork_score BETWEEN 1 AND 5)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Đánh giá tổng kết theo tiêu chí của mentor, có lưu trạng thái nháp/chốt';
+
+CREATE TABLE IF NOT EXISTS mentor_final_evaluation_history (
+    id                       BIGINT AUTO_INCREMENT PRIMARY KEY,
+    evaluation_id            BIGINT       NOT NULL,
+    revision_no              INT          NOT NULL,
+    actor_user_id            BIGINT       NULL,
+    action_code              VARCHAR(30)  NOT NULL,
+    status                   VARCHAR(30)  NOT NULL,
+    knowledge_score          TINYINT      NULL,
+    problem_solving_score    TINYINT      NULL,
+    initiative_score         TINYINT      NULL,
+    teamwork_score           TINYINT      NULL,
+    skill_score              DECIMAL(3,1) NULL,
+    attitude_score           DECIMAL(3,1) NULL,
+    overall_score            DECIMAL(3,1) NULL,
+    overall_comments         VARCHAR(2000) NOT NULL DEFAULT '',
+    archived_at              DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_mentor_final_evaluation_revision UNIQUE (evaluation_id, revision_no),
+    CONSTRAINT fk_mentor_final_evaluation_history_evaluation FOREIGN KEY (evaluation_id)
+        REFERENCES mentor_final_evaluations(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_mentor_final_evaluation_history_actor FOREIGN KEY (actor_user_id) REFERENCES users(id)
+        ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Lịch sử bất biến các phiên bản đánh giá tổng kết';
+
+
+-- ============================================================================
+-- Nguồn hợp nhất: migration-006-final-report.sql
+-- ============================================================================
+
+-- Migration 005: Báo cáo cuối kỳ gửi trường / ban lãnh đạo
+
+-- 1. Danh bạ người nhận (trường hoặc ban lãnh đạo)
+CREATE TABLE IF NOT EXISTS report_recipients (
+    id                 BIGINT AUTO_INCREMENT PRIMARY KEY,
+    recipient_type     VARCHAR(20)  NOT NULL,
+    organization_name  VARCHAR(150) NOT NULL,
+    contact_name       VARCHAR(100) NOT NULL,
+    email              VARCHAR(150) NOT NULL,
+    created_by         BIGINT       NULL,
+    created_at         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_report_recipients UNIQUE (recipient_type, organization_name, email),
+    CONSTRAINT chk_report_recipients_type CHECK (recipient_type IN ('SCHOOL','LEADER')),
+    CONSTRAINT fk_report_recipients_user FOREIGN KEY (created_by) REFERENCES users(id)
+        ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Danh bạ người nhận báo cáo cuối kỳ';
+
+-- 2. Bản chụp báo cáo (bất biến)
+CREATE TABLE IF NOT EXISTS report_snapshots (
+    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
+    report_type    VARCHAR(20)  NOT NULL,
+    program_ids    VARCHAR(255) NOT NULL,
+    program_names  VARCHAR(500) NOT NULL,
+    payload_json   LONGTEXT     NOT NULL,
+    created_by     BIGINT       NULL,
+    created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_report_snapshots_type CHECK (report_type IN ('LEADER','SCHOOL')),
+    CONSTRAINT fk_report_snapshots_user FOREIGN KEY (created_by) REFERENCES users(id)
+        ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Bản chụp báo cáo cuối kỳ, không sửa không xóa';
+
+-- Chặn sửa/xóa bản chụp ngay tại database
+DROP TRIGGER IF EXISTS trg_report_snapshots_no_update;
+DROP TRIGGER IF EXISTS trg_report_snapshots_no_delete;
+DELIMITER $$
+CREATE TRIGGER trg_report_snapshots_no_update BEFORE UPDATE ON report_snapshots
+FOR EACH ROW BEGIN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Bản chụp báo cáo không được sửa';
+END$$
+CREATE TRIGGER trg_report_snapshots_no_delete BEFORE DELETE ON report_snapshots
+FOR EACH ROW BEGIN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Bản chụp báo cáo không được xóa';
+END$$
+DELIMITER ;
+
+CREATE TABLE IF NOT EXISTS report_send_logs (
+    id               BIGINT AUTO_INCREMENT PRIMARY KEY,
+    snapshot_id      BIGINT       NOT NULL,
+    batch_token      VARCHAR(64)  NOT NULL,
+    school_name      VARCHAR(150) NULL,
+    recipient_email  VARCHAR(150) NOT NULL,
+    status           VARCHAR(20)  NOT NULL DEFAULT 'PENDING',
+    attempts         INT          NOT NULL DEFAULT 0,
+    error_message    VARCHAR(500) NULL,
+    sent_by          BIGINT       NULL,
+    sent_at          DATETIME     NULL,
+    created_at       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_report_send_batch UNIQUE (batch_token, recipient_email),
+    CONSTRAINT chk_report_send_status CHECK (status IN ('PENDING','SENT','FAILED')),
+    CONSTRAINT fk_report_send_snapshot FOREIGN KEY (snapshot_id) REFERENCES report_snapshots(id)
+        ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_report_send_user FOREIGN KEY (sent_by) REFERENCES users(id)
+        ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Lịch sử gửi báo cáo cho từng địa chỉ';
+
+CREATE INDEX idx_report_snapshots_scope ON report_snapshots(report_type, program_ids, created_at);
+CREATE INDEX idx_report_send_snapshot   ON report_send_logs(snapshot_id);
+
+
+-- ============================================================================
+-- Nguồn hợp nhất: demo-data.sql
+-- ============================================================================
+
+-- Seed data cho bảng roles
+INSERT IGNORE INTO roles (id, role_code, role_name, description) VALUES
+    (1, 'ADMIN',  'Quản trị viên', 'Quản trị hệ thống'),
+    (2, 'HR',     'Phòng nhân sự', 'Quản lý nhân sự và TTS'),
+    (3, 'MENTOR', 'Cán bộ Hướng dẫn', 'Hướng dẫn thực tập sinh'),
+    (4, 'INTERN', 'Thực tập sinh', 'Sinh viên thực tập'),
+    (5, 'CANDIDATE', 'Ứng viên', 'Ứng viên đăng ký thực tập trực tuyến');
+
+INSERT IGNORE INTO permissions (permission_code, permission_name, module_group) VALUES
+    ('INTERN_CREATE', 'Tạo hồ sơ thực tập sinh', 'INTERN'),
+    ('INTERN_EDIT', 'Chỉnh sửa hồ sơ thực tập sinh', 'INTERN'),
+    ('DOCUMENT_REVIEW', 'Duyệt tài liệu thực tập sinh', 'DOCUMENT'),
+    ('DOCUMENT_UPLOAD', 'Tải tài liệu thực tập sinh', 'DOCUMENT');
+
+INSERT IGNORE INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id FROM roles r CROSS JOIN permissions p
+WHERE r.role_code = 'ADMIN'
+   OR (r.role_code = 'HR' AND p.permission_code IN ('INTERN_CREATE', 'INTERN_EDIT', 'DOCUMENT_REVIEW'))
+   OR (r.role_code = 'INTERN' AND p.permission_code = 'DOCUMENT_UPLOAD');
+
+-- CHỈ DÙNG CHO MÔI TRƯỜNG DEMO/LOCAL.
+INSERT IGNORE INTO users (
+    id,
+    username,
+    password,
+    email,
+    full_name,
+    status,
+    create_at,
+    update_at
+)
+VALUES
+    (1, 'admin_demo',  '123456', 'admin.demo@ims.local',  'Quản trị viên Demo', 'ACTIVE', CURDATE(), CURDATE()),
+    (2, 'hr_demo',     '123456', 'hr.demo@ims.local',     'Nhân sự Demo',       'ACTIVE', CURDATE(), CURDATE()),
+    (3, 'mentor_demo', '123456', 'mentor.demo@ims.local', 'Mentor Demo',        'ACTIVE', CURDATE(), CURDATE()),
+    (4, 'intern_demo', '123456', 'intern.demo@ims.local', 'Thực tập sinh Demo', 'ACTIVE', CURDATE(), CURDATE());
+
+INSERT IGNORE INTO user_roles (user_id, role_id)
+SELECT u.id, r.id FROM users u JOIN roles r
+WHERE (u.username = 'admin_demo'  AND r.role_code = 'ADMIN')
+   OR (u.username = 'hr_demo'     AND r.role_code = 'HR')
+   OR (u.username = 'mentor_demo' AND r.role_code = 'MENTOR')
+   OR (u.username = 'intern_demo' AND r.role_code = 'INTERN');
+
+INSERT IGNORE INTO departments (id,dept_code,dept_name,is_active) VALUES
+    (1,'IT','Công nghệ thông tin',TRUE);
+
+INSERT IGNORE INTO internship_programs
+    (id,program_code,program_name,department_id,quota_count,start_date,end_date,status)
+VALUES (1,'DEMO-IT-2026','Chương trình thực tập CNTT 2026',1,10,'2026-10-01','2026-12-31','ACTIVE');
+
+-- Seed data cho intern_profiles
+INSERT IGNORE INTO intern_profiles (
+    id, user_id, intern_code, identity_number, date_of_birth, gender,
+    address, university_name, major_name, phone_number, internship_status
+) VALUES
+    (1, 4, 'TTS001', '001200001234', '2002-05-15', 'Nam', 'Hà Nội', 'ĐH Bách Khoa', 'Công nghệ thông tin', '0912345678', 'ACTIVE');
+
+UPDATE intern_profiles SET program_id=1,start_date='2026-09-01',end_date='2026-10-31'
+WHERE id=1 AND program_id IS NULL;
+
+-- Seed data cho intern_documents
+INSERT IGNORE INTO intern_documents (
+    id, intern_profile_id, document_type, file_name, file_url, file_size_bytes, approval_status, rejection_note, uploaded_at
+) VALUES
+    (1, 1, 'CV', 'CV_ThucTapSinh_Demo.pdf', '/uploads/demo_cv.pdf', 1048576, 'PENDING', NULL, NOW());

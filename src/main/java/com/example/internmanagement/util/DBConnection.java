@@ -122,7 +122,6 @@ public class DBConnection {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        executeSqlScript("schema.sql");
-        executeSqlScript("demo-data.sql");
+        executeSqlScript("database.sql");
     }
 }

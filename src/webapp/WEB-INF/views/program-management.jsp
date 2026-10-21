@@ -92,6 +92,6 @@ document.querySelectorAll('form').forEach(function(form){
   var end=form.querySelector('[name="endDate"]'); if(end)end.addEventListener('input',function(){this.setCustomValidity('');});
 });
 </script>
-<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261010-2"></script>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261013-2"></script>
 </body>
 </html>

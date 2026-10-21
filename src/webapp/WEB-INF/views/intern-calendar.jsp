@@ -14,7 +14,7 @@
 <div class="layout">
     <aside class="sidebar">
         <div class="logo"><div class="logo-icon"><i class="fa-solid fa-user-graduate"></i></div><div><h2>IMS Portal</h2><span>Dành cho Thực tập sinh</span></div></div>
-        <nav class="menu"><p class="menu-title">TRANG CÁ NHÂN</p><a href="${pageContext.request.contextPath}/home" class="menu-item"><i class="fa-solid fa-house"></i><span>Trang cá nhân</span></a><a href="${pageContext.request.contextPath}/interns/profile" class="menu-item"><i class="fa-solid fa-id-card"></i><span>Hồ sơ của tôi</span></a><a href="${pageContext.request.contextPath}/my-contract" class="menu-item"><i class="fa-solid fa-file-contract"></i><span>Hợp đồng của tôi</span></a><a href="${pageContext.request.contextPath}/my-calendar" class="menu-item active"><i class="fa-solid fa-calendar-days"></i><span>Lịch thực tập</span></a><a href="${pageContext.request.contextPath}/attendance" class="menu-item"><i class="fa-solid fa-clock"></i><span>Check-in / Check-out</span></a></nav>
+        <nav class="menu"><p class="menu-title">TRANG CÁ NHÂN</p><a href="${pageContext.request.contextPath}/home" class="menu-item"><i class="fa-solid fa-house"></i><span>Trang cá nhân</span></a><a href="${pageContext.request.contextPath}/interns/profile" class="menu-item"><i class="fa-solid fa-id-card"></i><span>Hồ sơ của tôi</span></a><a href="${pageContext.request.contextPath}/my-contract" class="menu-item"><i class="fa-solid fa-file-contract"></i><span>Hợp đồng của tôi</span></a><a href="${pageContext.request.contextPath}/my-calendar" class="menu-item active"><i class="fa-solid fa-calendar-days"></i><span>Lịch thực tập</span></a><a href="${pageContext.request.contextPath}/attendance" class="menu-item"><i class="fa-solid fa-clock"></i><span>Check-in / Check-out</span></a><a href="${pageContext.request.contextPath}/leave-requests" class="menu-item"><i class="fa-solid fa-plane-departure"></i><span>Đăng ký nghỉ phép</span></a></nav>
         
     </aside>
     <main class="main">
@@ -44,6 +44,6 @@
         </section>
     </main>
 </div>
-<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261008-1"></script>
+<script src="${pageContext.request.contextPath}/frontend/js/intern-header.js?v=20261014-nav1"></script>
 </body>
 </html>
