@@ -25,10 +25,33 @@ Khi chạy local, có thể sao chép `src/main/resources/db-config.example.json
 
 ## Khởi tạo dữ liệu
 
-1. Tạo/kết nối MySQL bằng tài khoản đã cấu hình.
-2. Chạy một file duy nhất: `src/main/resources/database.sql`.
+Sau khi cấu hình MySQL, mở PowerShell tại thư mục dự án và chạy một lệnh:
+
+```powershell
+.\setup-database.ps1
+```
+
+Script tự đọc các biến `IMS_DB_*` hoặc `src/main/resources/db-config.json`, sau đó
+nạp file `src/main/resources/database.sql` bằng MySQL Client. Nếu PowerShell chặn
+script cục bộ, chạy:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup-database.ps1
+```
 
 File này đã bao gồm toàn bộ cấu trúc bảng, phần mở rộng nghiệp vụ và dữ liệu mẫu cần thiết cho môi trường local.
+
+### Chuẩn bị nhanh dữ liệu demo Mentor
+
+Sau khi khởi tạo cơ sở dữ liệu, chạy:
+
+```powershell
+.\setup-mentor-demo.ps1
+```
+
+Script tự tạo hoặc cập nhật dữ liệu trình diễn cho `mentor_demo`, gồm thực tập sinh
+được phân công, nhiệm vụ, tiến độ, báo cáo tuần, bản nháp đánh giá, lịch họp và thông
+báo. Có thể chạy lại script mà không tạo trùng các bản ghi demo chính.
 
 ## Build và chạy
 
