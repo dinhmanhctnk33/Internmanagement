@@ -41,17 +41,39 @@ powershell -ExecutionPolicy Bypass -File .\setup-database.ps1
 
 File này đã bao gồm toàn bộ cấu trúc bảng, phần mở rộng nghiệp vụ và dữ liệu mẫu cần thiết cho môi trường local.
 
-### Chuẩn bị nhanh dữ liệu demo Mentor
+### Chuẩn bị dữ liệu demo theo vai trò
 
-Sau khi khởi tạo cơ sở dữ liệu, chạy:
+Sau khi chạy `setup-database.ps1`, chọn script tương ứng với vai trò cần
+trình diễn:
+
+| Vai trò | Script | Tài khoản | Mật khẩu |
+|---|---|---|---|
+| Mentor | `.\setup-mentor-demo.ps1` | `mentor_demo` | `123456` |
+| HR | `.\setup-hr-demo.ps1` | `hr_demo` | `123456` |
+| Intern | `.\setup-intern-demo.ps1` | `intern_demo` | `123456` |
+| Admin | `.\setup-admin-demo.ps1` | `admin_demo` | `123456` |
+
+Ví dụ, để chuẩn bị toàn bộ dữ liệu cho cả bốn vai trò:
 
 ```powershell
-.\setup-mentor-demo.ps1
+.\setup-admin-demo.ps1
 ```
 
-Script tự tạo hoặc cập nhật dữ liệu trình diễn cho `mentor_demo`, gồm thực tập sinh
-được phân công, nhiệm vụ, tiến độ, báo cáo tuần, bản nháp đánh giá, lịch họp và thông
-báo. Có thể chạy lại script mà không tạo trùng các bản ghi demo chính.
+Các script được xếp theo chuỗi phụ thuộc: Admin chuẩn bị Intern, Intern chuẩn bị
+HR, và HR chuẩn bị Mentor. Vì vậy chạy `setup-admin-demo.ps1` là đủ cho môi
+trường demo đầy đủ; khi chỉ cần một luồng nhỏ hơn, có thể chạy script của
+vai trò tương ứng.
+
+Mỗi bộ dữ liệu có 10 bản ghi mẫu cho các màn hình nghiệp vụ chính,
+bao gồm nhiều trạng thái để thuận tiện trình diễn và kiểm thử. Các script có
+thể chạy lại; những bản ghi demo chính sẽ được bỏ qua hoặc cập nhật thay vì
+tạo trùng.
+
+Nếu PowerShell chặn script cục bộ, có thể chạy, ví dụ với bộ Admin:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup-admin-demo.ps1
+```
 
 ## Build và chạy
 
