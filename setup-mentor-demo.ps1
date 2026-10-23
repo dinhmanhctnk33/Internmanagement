@@ -75,12 +75,21 @@ USE internship_management;
 -- Tài khoản và vai trò dùng cho buổi demo.
 INSERT IGNORE INTO users(username,password,email,full_name,status,create_at,update_at) VALUES
 ('mentor_demo','123456','mentor.demo@ims.local','Mentor Demo','ACTIVE',CURDATE(),CURDATE()),
-('intern_demo','123456','intern.demo@ims.local','Thực tập sinh Demo','ACTIVE',CURDATE(),CURDATE());
+('intern_demo','123456','intern.demo@ims.local','Thực tập sinh Demo 01','ACTIVE',CURDATE(),CURDATE()),
+('intern_demo_02','123456','intern.demo02@ims.local','Thực tập sinh Demo 02','ACTIVE',CURDATE(),CURDATE()),
+('intern_demo_03','123456','intern.demo03@ims.local','Thực tập sinh Demo 03','ACTIVE',CURDATE(),CURDATE()),
+('intern_demo_04','123456','intern.demo04@ims.local','Thực tập sinh Demo 04','ACTIVE',CURDATE(),CURDATE()),
+('intern_demo_05','123456','intern.demo05@ims.local','Thực tập sinh Demo 05','ACTIVE',CURDATE(),CURDATE()),
+('intern_demo_06','123456','intern.demo06@ims.local','Thực tập sinh Demo 06','ACTIVE',CURDATE(),CURDATE()),
+('intern_demo_07','123456','intern.demo07@ims.local','Thực tập sinh Demo 07','ACTIVE',CURDATE(),CURDATE()),
+('intern_demo_08','123456','intern.demo08@ims.local','Thực tập sinh Demo 08','ACTIVE',CURDATE(),CURDATE()),
+('intern_demo_09','123456','intern.demo09@ims.local','Thực tập sinh Demo 09','ACTIVE',CURDATE(),CURDATE()),
+('intern_demo_10','123456','intern.demo10@ims.local','Thực tập sinh Demo 10','ACTIVE',CURDATE(),CURDATE());
 
 INSERT IGNORE INTO user_roles(user_id,role_id)
 SELECT u.id,r.id FROM users u JOIN roles r
 WHERE (u.username='mentor_demo' AND r.role_code='MENTOR')
-   OR (u.username='intern_demo' AND r.role_code='INTERN');
+   OR (u.username REGEXP '^intern_demo(_0[2-9]|_10)?$' AND r.role_code='INTERN');
 
 INSERT IGNORE INTO departments(dept_code,dept_name,is_active)
 VALUES('IT','Công nghệ thông tin',TRUE);
@@ -101,12 +110,12 @@ WHERE program_code='DEMO-MENTOR';
 SET @mentor_user_id=(SELECT id FROM users WHERE username='mentor_demo' LIMIT 1);
 INSERT INTO mentors(user_id,full_name,email,mentor_code,department_id,job_title,max_capacity,status)
 SELECT @mentor_user_id,'Mentor Demo','mentor.demo@ims.local','MTR-DEMO',@department_id,
-       'Kỹ sư hướng dẫn',5,'ACTIVE'
+       'Kỹ sư hướng dẫn',10,'ACTIVE'
 WHERE NOT EXISTS(SELECT 1 FROM mentors WHERE user_id=@mentor_user_id OR mentor_code='MTR-DEMO');
 
 UPDATE mentors
 SET full_name='Mentor Demo',email='mentor.demo@ims.local',department_id=@department_id,
-    job_title='Kỹ sư hướng dẫn',max_capacity=5,status='ACTIVE'
+    job_title='Kỹ sư hướng dẫn',max_capacity=10,status='ACTIVE'
 WHERE user_id=@mentor_user_id OR mentor_code='MTR-DEMO';
 
 SET @mentor_id=(SELECT id FROM mentors WHERE user_id=@mentor_user_id OR mentor_code='MTR-DEMO' ORDER BY id LIMIT 1);
@@ -128,25 +137,49 @@ WHERE user_id=@intern_user_id;
 
 SET @intern_id=(SELECT id FROM intern_profiles WHERE user_id=@intern_user_id LIMIT 1);
 
--- Nhiệm vụ ở nhiều trạng thái để trình diễn theo dõi tiến độ.
-INSERT INTO tasks(task_title,description,mentor_id,intern_profile_id,due_date,priority,completion_percent,status,intern_note,progress_updated_at)
-SELECT 'Xây dựng API quản lý thực tập sinh','Hoàn thiện API danh sách, tìm kiếm và cập nhật hồ sơ thực tập sinh.',@mentor_id,@intern_id,DATE_ADD(NOW(),INTERVAL 7 DAY),'HIGH',65,'IN_PROGRESS','Đã hoàn thiện API danh sách và đang xử lý phần cập nhật.',NOW()
-WHERE NOT EXISTS(SELECT 1 FROM tasks WHERE intern_profile_id=@intern_id AND task_title='Xây dựng API quản lý thực tập sinh');
+-- Bổ sung đủ 10 hồ sơ thực tập sinh cho mentor demo.
+INSERT INTO intern_profiles
+(user_id,intern_code,identity_number,date_of_birth,gender,address,university_name,major_name,
+ program_id,mentor_id,start_date,end_date,phone_number,internship_status)
+SELECT u.id,CONCAT('TTS-DEMO-',LPAD(SUBSTRING(u.username,13),2,'0')),
+       CONCAT('00120000',LPAD(SUBSTRING(u.username,13),4,'0')),
+       DATE_ADD('2003-01-01',INTERVAL CAST(SUBSTRING(u.username,13) AS UNSIGNED)*12 DAY),
+       IF(MOD(CAST(SUBSTRING(u.username,13) AS UNSIGNED),2)=0,'Nữ','Nam'),'Hà Nội',
+       IF(MOD(CAST(SUBSTRING(u.username,13) AS UNSIGNED),2)=0,'Đại học Kinh tế Quốc dân','Đại học Bách Khoa Hà Nội'),
+       'Công nghệ thông tin',@program_id,@mentor_id,
+       DATE_SUB(CURDATE(),INTERVAL 35 DAY),DATE_ADD(CURDATE(),INTERVAL 55 DAY),
+       CONCAT('09123456',LPAD(SUBSTRING(u.username,13),2,'0')),'ACTIVE'
+FROM users u
+WHERE u.username REGEXP '^intern_demo_(0[2-9]|10)$'
+  AND NOT EXISTS(SELECT 1 FROM intern_profiles ip WHERE ip.user_id=u.id);
 
-INSERT INTO tasks(task_title,description,mentor_id,intern_profile_id,due_date,priority,completion_percent,status,intern_note,progress_updated_at)
-SELECT 'Viết tài liệu hướng dẫn sử dụng','Tổng hợp quy trình nghiệp vụ và ảnh minh họa cho tài liệu bàn giao.',@mentor_id,@intern_id,DATE_ADD(NOW(),INTERVAL 12 DAY),'MEDIUM',25,'IN_PROGRESS','Đã lập dàn ý tài liệu.',NOW()
-WHERE NOT EXISTS(SELECT 1 FROM tasks WHERE intern_profile_id=@intern_id AND task_title='Viết tài liệu hướng dẫn sử dụng');
+DROP TEMPORARY TABLE IF EXISTS demo_numbers;
+CREATE TEMPORARY TABLE demo_numbers(n INT PRIMARY KEY);
+INSERT INTO demo_numbers(n) VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10);
 
+-- Mỗi nhóm nghiệp vụ có 10 bản ghi, phân bổ trên 10 thực tập sinh.
 INSERT INTO tasks(task_title,description,mentor_id,intern_profile_id,due_date,priority,completion_percent,status,intern_note,progress_updated_at)
-SELECT 'Kiểm thử luồng đăng nhập và phân quyền','Kiểm thử các vai trò quản trị viên, nhân sự, mentor và thực tập sinh.',@mentor_id,@intern_id,DATE_SUB(NOW(),INTERVAL 2 DAY),'MEDIUM',100,'COMPLETED','Đã hoàn thành kiểm thử và ghi nhận kết quả.',NOW()
-WHERE NOT EXISTS(SELECT 1 FROM tasks WHERE intern_profile_id=@intern_id AND task_title='Kiểm thử luồng đăng nhập và phân quyền');
+SELECT CONCAT('Nhiệm vụ demo ',LPAD(d.n,2,'0')),
+       CONCAT('Nội dung nhiệm vụ demo số ',d.n,' dùng để trình diễn theo dõi tiến độ.'),
+       @mentor_id,ip.id,DATE_ADD(NOW(),INTERVAL d.n DAY),
+       ELT(MOD(d.n-1,4)+1,'LOW','MEDIUM','HIGH','URGENT'),
+       ELT(MOD(d.n-1,4)+1,0,35,70,100),
+       ELT(MOD(d.n-1,4)+1,'TODO','IN_PROGRESS','IN_PROGRESS','COMPLETED'),
+       CONCAT('Cập nhật tiến độ cho nhiệm vụ demo ',d.n,'.'),NOW()
+FROM demo_numbers d
+JOIN intern_profiles ip ON ip.intern_code=IF(d.n=1,'TTS-DEMO',CONCAT('TTS-DEMO-',LPAD(d.n,2,'0')))
+WHERE NOT EXISTS(SELECT 1 FROM tasks t WHERE t.mentor_id=@mentor_id AND t.task_title=CONCAT('Nhiệm vụ demo ',LPAD(d.n,2,'0')));
 
 -- Báo cáo tuần: có bản chờ duyệt và bản đã phản hồi.
 INSERT INTO weekly_reports(intern_profile_id,week_number,start_date,end_date,completed_work,key_learnings,obstacles,attachment_url,mentor_score,mentor_feedback,status)
-VALUES
-(@intern_id,1,DATE_SUB(CURDATE(),INTERVAL 28 DAY),DATE_SUB(CURDATE(),INTERVAL 22 DAY),'Tìm hiểu quy trình dự án và cấu trúc hệ thống.','Nắm được Servlet, JSP và mô hình DAO.','Cần làm quen thêm với cơ sở dữ liệu.',NULL,4.2,'Khởi đầu tốt, cần chủ động đặt câu hỏi hơn.','APPROVED'),
-(@intern_id,2,DATE_SUB(CURDATE(),INTERVAL 21 DAY),DATE_SUB(CURDATE(),INTERVAL 15 DAY),'Hoàn thành giao diện danh sách nhiệm vụ và tích hợp dữ liệu.','Cải thiện kỹ năng làm việc với Git và xử lý giao diện.','Một số trường hợp kiểm thử chưa đầy đủ.',NULL,4.5,'Tiến độ tốt, bổ sung thêm kiểm thử biên.','APPROVED'),
-(@intern_id,3,DATE_SUB(CURDATE(),INTERVAL 14 DAY),DATE_SUB(CURDATE(),INTERVAL 8 DAY),'Xây dựng API quản lý thực tập sinh và cập nhật tài liệu.','Hiểu rõ hơn về phân quyền và kiểm tra dữ liệu đầu vào.','Cần mentor góp ý cách tổ chức mã nguồn.',NULL,NULL,NULL,'SUBMITTED')
+SELECT ip.id,d.n,DATE_SUB(CURDATE(),INTERVAL (11-d.n)*7 DAY),DATE_SUB(CURDATE(),INTERVAL ((11-d.n)*7-6) DAY),
+       CONCAT('Hoàn thành công việc demo tuần ',d.n,'.'),'Cải thiện kỹ năng Java, SQL và làm việc nhóm.',
+       IF(MOD(d.n,3)=0,'Cần mentor góp ý thêm về cách tổ chức mã nguồn.','Không có trở ngại lớn.'),NULL,
+       IF(d.n<=6,ROUND(3.5+d.n/10,1),NULL),IF(d.n<=6,'Tiến độ tốt, tiếp tục phát huy.',NULL),
+       IF(d.n<=6,'APPROVED','SUBMITTED')
+FROM demo_numbers d
+JOIN intern_profiles ip ON ip.intern_code=IF(d.n=1,'TTS-DEMO',CONCAT('TTS-DEMO-',LPAD(d.n,2,'0')))
+WHERE TRUE
 ON DUPLICATE KEY UPDATE completed_work=VALUES(completed_work),key_learnings=VALUES(key_learnings),
 obstacles=VALUES(obstacles),mentor_score=VALUES(mentor_score),mentor_feedback=VALUES(mentor_feedback),status=VALUES(status);
 
@@ -154,25 +187,40 @@ obstacles=VALUES(obstacles),mentor_score=VALUES(mentor_score),mentor_feedback=VA
 INSERT INTO mentor_final_evaluations
 (intern_profile_id,mentor_id,status,knowledge_score,problem_solving_score,initiative_score,teamwork_score,
  skill_score,attitude_score,overall_score,overall_comments,revision_no,finalization_count)
-VALUES(@intern_id,@mentor_id,'DRAFT',4,4,5,4,4.0,4.5,4.3,
-       'Thực tập sinh có tiến bộ tốt, chủ động và phối hợp hiệu quả với nhóm.',1,0)
-ON DUPLICATE KEY UPDATE mentor_id=VALUES(mentor_id);
+SELECT ip.id,@mentor_id,IF(d.n<=3,'FINALIZED','DRAFT'),4,4,IF(MOD(d.n,2)=0,5,4),4,
+       4.0,4.5,4.3,'Thực tập sinh có tiến bộ tốt, chủ động và phối hợp hiệu quả với nhóm.',1,IF(d.n<=3,1,0)
+FROM demo_numbers d
+JOIN intern_profiles ip ON ip.intern_code=IF(d.n=1,'TTS-DEMO',CONCAT('TTS-DEMO-',LPAD(d.n,2,'0')))
+WHERE TRUE
+ON DUPLICATE KEY UPDATE mentor_id=VALUES(mentor_id),status=VALUES(status);
 
 -- Lịch họp sắp tới.
 INSERT INTO meetings(title,meeting_date,start_time,end_time,meeting_mode,location_or_link,description,creator_user_id,status,version_no)
-SELECT 'Họp đánh giá tiến độ tuần',DATE_ADD(CURDATE(),INTERVAL 2 DAY),'09:00:00','09:45:00','ONLINE',
-       'https://meet.google.com/demo-mentor','Trao đổi kết quả tuần và thống nhất nhiệm vụ tiếp theo.',@mentor_user_id,'ACTIVE',1
-WHERE NOT EXISTS(SELECT 1 FROM meetings WHERE title='Họp đánh giá tiến độ tuần' AND creator_user_id=@mentor_user_id AND status='ACTIVE');
+SELECT CONCAT('Họp demo ',LPAD(d.n,2,'0')),DATE_ADD(CURDATE(),INTERVAL d.n DAY),
+       ADDTIME('08:00:00',SEC_TO_TIME((d.n-1)*3600)),ADDTIME('08:45:00',SEC_TO_TIME((d.n-1)*3600)),
+       IF(MOD(d.n,2)=0,'OFFLINE','ONLINE'),IF(MOD(d.n,2)=0,'Phòng họp IT','https://meet.google.com/demo-mentor'),
+       CONCAT('Trao đổi kết quả và kế hoạch cho thực tập sinh demo ',d.n,'.'),@mentor_user_id,'ACTIVE',1
+FROM demo_numbers d
+WHERE NOT EXISTS(SELECT 1 FROM meetings m WHERE m.title=CONCAT('Họp demo ',LPAD(d.n,2,'0')) AND m.creator_user_id=@mentor_user_id);
 
-SET @meeting_id=(SELECT id FROM meetings WHERE title='Họp đánh giá tiến độ tuần' AND creator_user_id=@mentor_user_id AND status='ACTIVE' ORDER BY id DESC LIMIT 1);
 INSERT INTO meeting_recipients(meeting_id,intern_profile_id,recipient_name,recipient_email,is_active,last_email_status,last_email_type)
-VALUES(@meeting_id,@intern_id,'Thực tập sinh Demo','intern.demo@ims.local',TRUE,'PENDING','INVITATION')
+SELECT m.id,ip.id,u.full_name,u.email,TRUE,'PENDING','INVITATION'
+FROM demo_numbers d
+JOIN meetings m ON m.title=CONCAT('Họp demo ',LPAD(d.n,2,'0')) AND m.creator_user_id=@mentor_user_id
+JOIN intern_profiles ip ON ip.intern_code=IF(d.n=1,'TTS-DEMO',CONCAT('TTS-DEMO-',LPAD(d.n,2,'0')))
+JOIN users u ON u.id=ip.user_id
+WHERE TRUE
 ON DUPLICATE KEY UPDATE is_active=TRUE,recipient_name=VALUES(recipient_name),recipient_email=VALUES(recipient_email);
 
 -- Thông báo mẫu trên bảng điều khiển mentor.
 INSERT INTO notifications(user_id,title,message,target_url,is_read)
-SELECT @mentor_user_id,'Báo cáo tuần mới','Thực tập sinh Demo đã nộp báo cáo tuần 3.','/mentor/reports',FALSE
-WHERE NOT EXISTS(SELECT 1 FROM notifications WHERE user_id=@mentor_user_id AND title='Báo cáo tuần mới' AND message LIKE '%tuần 3%');
+SELECT @mentor_user_id,CONCAT('Thông báo demo ',LPAD(d.n,2,'0')),
+       CONCAT('Thực tập sinh Demo ',LPAD(d.n,2,'0'),' đã cập nhật tiến độ.'),
+       IF(MOD(d.n,2)=0,'/mentor/tasks','/mentor/reports'),d.n<=3
+FROM demo_numbers d
+WHERE NOT EXISTS(SELECT 1 FROM notifications n WHERE n.user_id=@mentor_user_id AND n.title=CONCAT('Thông báo demo ',LPAD(d.n,2,'0')));
+
+DROP TEMPORARY TABLE demo_numbers;
 
 SELECT 'MENTOR_DEMO_READY' AS result,@mentor_id AS mentor_id,@intern_id AS intern_profile_id;
 '@
